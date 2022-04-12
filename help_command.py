@@ -1,9 +1,3 @@
-from http import client
-from multiprocessing.sharedctypes import Value
-from random import random
-from turtle import color, title
-from unicodedata import name
-
 
 async def help(discord,client,ctx):
     embed = discord.Embed(
