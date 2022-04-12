@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord.ui import Button,View
 from dotenv import load_dotenv,find_dotenv
 
-from src.modules import dm_message,help_command,playerinfo_command,status
+from modules import dm_message,help_command,playerinfo_command,status
 
 load_dotenv(find_dotenv())
 
