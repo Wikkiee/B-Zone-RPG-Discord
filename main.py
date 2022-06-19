@@ -41,7 +41,7 @@ async def playerinfo(ctx,player_name):
             time.sleep(5)
             async with aiohttp.ClientSession() as session:
                 site_url = 'https://bzone-bot-api.herokuapp.com/playerinfo/{}'.format(player_name)
-                #site_url = 'http://localhost:3000/playerinfo/{}'.format(player_name)
+               #site_url = 'http://localhost:3000/playerinfo/{}'.format(player_name)
                 async with session.get(site_url) as resp:
                     data = await resp.json()
                     print(data)

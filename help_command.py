@@ -2,10 +2,11 @@
 async def help(discord,client,ctx):
     embed = discord.Embed(
         title="Help commands",
-        description = "Test function",
+        description = "Use `!` as a prefix for all the commands",
         color = discord.Color.random(),
     )
 
-    embed.add_field(name="Test command",value="test value 1 \n test value 2 \n test value 3",inline=False)
-    embed.set_thumbnail(url = client.user.avatar_url)
+    embed.add_field(name="Players info",value="**`!Playerinfo(pi)` - To check the player stats \n Comming soon \n Comming soon**",inline=True)
+    embed.add_field(name="Players info",value="**`!Playerinfo(pi)` - To check the player stats \n Comming soon \n Comming soon**",inline=True)
+    embed.set_thumbnail(url = ctx.author.display_avatar)
     await ctx.send(embed=embed)
