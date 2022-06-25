@@ -31,35 +31,38 @@ async def on_message(message):
 @client.event
 async def on_command_error(ctx,error):
 
+    def get_error_embed(error):
+        if(error == "MissingRequiredArgument"):
+            description = "Please enter all the required arugments"
+        elif(error == "MemberNotFound"):
+            description = "Please mention the valid member (@mention)"
+        elif(error == "CommandNotFound"):
+            description = "Please use the valid command, use [!help] to know more"
+        elif(error == "CommandInvokeError"):
+            description = "Please wait, there's some issue with backend server"
+        embed = discord.Embed(
+        title="**Error occured**",
+        description=description,
+        color=discord.Colour.random()
+        )
+        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        return embed
+
     if isinstance(error,commands.MissingPermissions):
         print("Working")
+
     elif isinstance(error,commands.MissingRequiredArgument):
-        embed = discord.Embed(
-        title="**Error occured**",
-        description="Please enter all the required arugments",
-        color=discord.Colour.random()
-        )
-        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
-   
-        await ctx.reply(embed = embed)
-    elif isinstance(error,commands.MemberNotFound):
-        embed = discord.Embed(
-        title="**Error occured**",
-        description="Please mention the valid member (@mention)",
-        color=discord.Colour.random()
-        )
-        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
-   
-        await ctx.reply(embed = embed)
-    elif isinstance(error,commands.CommandNotFound):
-        embed = discord.Embed(
-        title="**Error occured**",
-        description="Please use the valid command, use [!help] to know more",
-        color=discord.Colour.random()
-        )
-        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
-        await ctx.reply(embed = embed)
+        await ctx.reply(embed = get_error_embed("MissingRequiredArgument"))
     
+    elif isinstance(error,commands.MemberNotFound):
+        await ctx.reply(embed = get_error_embed("MemberNotFound"))
+
+    elif isinstance(error,commands.CommandNotFound):
+        await ctx.reply(embed = get_error_embed("CommandNotFound"))
+
+    elif isinstance(error,commands.CommandInvokeError):
+        await ctx.reply(embed = get_error_embed("CommandInvokeError"))
+
     else:
         raise error
 
@@ -107,32 +110,31 @@ async def spamcommand(ctx,limit,*,msg):
 
 @client.command(aliases = ["pi","id"])
 async def playerinfo(ctx,player_name):
+
     try:
+
         embed = discord.Embed(
-        description="**Fetching Your In-Game data** \n Please wait for a while",
-        color=discord.Colour.random()
-    )
+            description="**Fetching Your In-Game data** \n Please wait for a while",
+            color=discord.Colour.random()
+        )
         await ctx.reply(embed = embed)
         data={}
-        try:
-            time.sleep(5)
-            async with aiohttp.ClientSession() as session:
-                #site_url = 'https://bzone-bot-api.herokuapp.com/playerinfo/{}'.format(player_name)
-                site_url = 'http://localhost:3000/playerinfo/{}'.format(player_name)
-                async with session.get(site_url) as resp:
-                    data = await resp.json()
-                    await playerinfo_command.playerinfo_func(discord,ctx,data)
-
-        except None:
-            print("error")
+        time.sleep(5)
+        async with aiohttp.ClientSession() as session:
+            #site_url = 'https://bzone-bot-api.herokuapp.com/playerinfo/{}'.format(player_name)
+            site_url= "https://bzone-bot-api-2.herokuapp.com/playerinfo/{}".format(player_name)
+            #site_url = 'http://localhost:3000/playerinfo/{}'.format(player_name)
+            async with session.get(site_url) as resp:
+                data = await resp.json()
+                await playerinfo_command.playerinfo_func(discord,ctx,data)
     except:
         embed = discord.Embed(
-        description="**Error** \n Please enter a valid user name",
+        title="**Error occured**",
+        description="Please wait, there's some issue with backend server",
         color=discord.Colour.random()
-    )
+        )
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
         await ctx.reply(embed = embed)
-
 
 
 
@@ -150,13 +152,20 @@ async def factions(ctx):
     try:
             time.sleep(5)
             async with aiohttp.ClientSession() as session:
-                site_url = 'http://localhost:3000/factions'
+                site_url= "https://bzone-bot-api-2.herokuapp.com/factions"
+                #site_url = 'http://localhost:3000/factions'
                 async with session.get(site_url) as resp:
                     data = await resp.json()
                     await factions_command.factions(data,discord,ctx)
 
-    except None:
-            print("error")
+    except:
+        embed = discord.Embed(
+        title="**Error occured**",
+        description="Please wait, there's some issue with backend server",
+        color=discord.Colour.random()
+        )
+        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        await ctx.reply(embed = embed)
 
 
 
@@ -171,13 +180,20 @@ async def leaders(ctx):
     try:
             time.sleep(5)
             async with aiohttp.ClientSession() as session:
-                site_url = 'http://localhost:3000/leaders'
+                site_url= "https://bzone-bot-api-2.herokuapp.com/leaders"
+                #site_url = 'http://localhost:3000/leaders'
                 async with session.get(site_url) as resp:
                     data = await resp.json()
                     await leaders_command.leaders(data,discord,ctx)
 
-    except None:
-            print("error")
+    except:
+        embed = discord.Embed(
+        title="**Error occured**",
+        description="Please wait, there's some issue with backend server",
+        color=discord.Colour.random()
+        )
+        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        await ctx.reply(embed = embed)
 
 
 @client.command(aliases = ["admins"])
@@ -191,13 +207,20 @@ async def helpers(ctx):
     try:
             time.sleep(5)
             async with aiohttp.ClientSession() as session:
-                site_url = 'http://localhost:3000/helpers'
+                site_url= "https://bzone-bot-api-2.herokuapp.com/helpers"
+                #site_url = 'http://localhost:3000/helpers'
                 async with session.get(site_url) as resp:
                     data = await resp.json()
                     await helpers_command.helpers(data,discord,ctx)
 
-    except None:
-            print("error")
+    except:
+        embed = discord.Embed(
+        title="**Error occured**",
+        description="Please wait, there's some issue with backend server",
+        color=discord.Colour.random()
+        )
+        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        await ctx.reply(embed = embed)
 
 
 #------------------------------- RPG Commands-Ends ----------------------------------

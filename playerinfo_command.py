@@ -11,14 +11,14 @@ async def playerinfo_func(discord,ctx,data):
     view = View()
     if (data["playerFound"] == 1):
         player_info_embed = discord.Embed(
-            title="{}'s info".format(data["ign"]),
+            title="[🤵] {}'s info".format(data["ign"]),
             description="**Currently : {} ** | ** Last login : {} **".format(data["current_status"],data["last_login"]),
             color=discord.Color.random(),
             url=data["profile_url"]
         )
 
         faction_info_embed = discord.Embed(
-            title="{}'s Faction".format(data["ign"]),
+            title="[🎯] {}'s Faction".format(data["ign"]),
             description="**Currently : {} ** | ** Last login : {} **".format(data["current_status"],data["last_login"]),
             color=discord.Color.random(),
             url= "https://www.rpg.b-zone.ro/{}".format(data['faction_url']) if data["faction_name"] != "Civilian" else None

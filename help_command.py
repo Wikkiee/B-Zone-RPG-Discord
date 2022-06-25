@@ -1,7 +1,7 @@
 
 async def help(discord,client,ctx):
     embed = discord.Embed(
-        title="B-zone RPG",
+        title="[🏆] B-zone RPG",
         description = """These are the features of B-zone RGP Bot if you have problems(bugs) with it or have any suggestions ,Please let me know using \n `!suggestions <your_Message>` \t \t \t
 》
 》""",

@@ -1,6 +1,6 @@
 async def helpers(data,discord,ctx):
         helpers_embed = discord.Embed(
-            title="👨‍✈️Staffs info",
+            title="[👨‍✈️] Staffs info",
             description="_These are the current status of all the Helpers & Admins",
             color=discord.Color.random(),
             url="https://www.rpg.b-zone.ro/staff/helpers"

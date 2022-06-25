@@ -1,6 +1,6 @@
 async def factions(data,discord,ctx):
         faction_embed = discord.Embed(
-            title="🎯Factions info",
+            title="[🎯] Factions info",
             description="_These are the current status of all the Factions_",
             color=discord.Color.random(),
             url="https://www.rpg.b-zone.ro/factions/index"

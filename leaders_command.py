@@ -1,6 +1,6 @@
 async def leaders(data,discord,ctx):
         leaders_embed = discord.Embed(
-            title="👑Leaders info",
+            title="[👑] Leaders info",
             description="_These are the current status of all the Leaders",
             color=discord.Color.random(),
             url="https://www.rpg.b-zone.ro/staff/leaders"
