@@ -1,12 +1,19 @@
 
 async def help(discord,client,ctx):
     embed = discord.Embed(
-        title="Help commands",
-        description = "Use `!` as a prefix for all the commands",
+        title="B-zone RPG",
+        description = """These are the features of B-zone RGP Bot if you have problems(bugs) with it or have any suggestions ,Please let me know using \n `!suggestions <your_Message>` \t \t \t
+》
+》""",
         color = discord.Color.random(),
     )
 
-    embed.add_field(name="Players info",value="**`!Playerinfo(pi)` - To check the player stats \n Comming soon \n Comming soon**",inline=True)
-    embed.add_field(name="Players info",value="**`!Playerinfo(pi)` - To check the player stats \n Comming soon \n Comming soon**",inline=True)
-    embed.set_thumbnail(url = ctx.author.display_avatar)
+    embed.add_field(name="[🕵️‍♂️] Players Commands",value="**`!id <RPG_player_name>`** - _To get the current status of a player _ ",inline=False)
+    embed.add_field(name="[🎯] Faction Commands",value=" **`!factions`** - _To get the Factions list and it's status_",inline=False)
+    embed.add_field(name="[👮‍♂️] Staff Commands",value=" **`!Helpers`** _To get the current status of a STAFFS (Both Helpers and Admins)_",inline=False)
+    embed.add_field(name="[🎈] Utilities Commands",value="**`!pfp <@mention>`** _To view the members profile pic_ ",inline=False)
+    embed.add_field(name="[💖] B-zone Supports",value="[Vist RPG Site](https://www.rpg.b-zone.ro/) | [Forum](https://forum.b-zone.ro/) | [Discord](https://discord.gg/qtXwDC2H) | [Contact](https://discord.gg/fKDbRTuTpe) ",inline=False)
+    embed.set_image(url="https://cdn.discordapp.com/attachments/959138134413684840/990095940780195890/ezgif.com-gif-maker_1.gif")
+    embed.set_thumbnail(url=client.user.avatar)
+    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
     await ctx.send(embed=embed)
