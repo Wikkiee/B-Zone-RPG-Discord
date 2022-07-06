@@ -9,15 +9,17 @@ from discord.ext import commands
 from discord.ui import Button,View
 from dotenv import load_dotenv,find_dotenv
 from discord.ext.commands import has_permissions, CheckFailure
-from database import insert_users_data,is_registered_user,clean_database,get_players_data,update_player_faction_rank
-from sfsi_and_sfpd_manager_command import verify
+from database import insert_users_data,is_registered_user,clean_database,get_players_data,update_player_faction_rank,is_registered_rpg_user
+from rank_verify import verify
 from status import status_task
 from roles import sfpd_roles,get_rank_role
 import dm_message,help_command,playerinfo_command,factions_command,leaders_command,helpers_command
 from rank_watcher import watcher
 from forum_tracker import tracker
-from unit_functions import role_update_embed_generator,imagur_upload_embed_generator
+from unit_functions import role_update_embed_generator,imagur_upload_embed_generator,channel_id,global_url
 from imgur_upload_handler import imgur_hanlder
+from reminder import training_reminder
+from web_scrapper import scrapper
 
 load_dotenv(find_dotenv())
 
@@ -31,22 +33,22 @@ client.remove_command("help")
 async def on_ready():
     print("Discord Bot has logged in as {0.user}".format(client))
     client.loop.create_task(status_task(client,asyncio,discord))
+    #client.loop.create_task(training_reminder(client))
     #client.loop.create_task(watcher(client,asyncio))
-
+    #client.loop.create_task(tracker(client,discord))
 #------------------------------- Utility Commands-Ends ----------------------------------
 
 @client.event
 async def on_message(message):
-    print(message)
-    if(message.channel.id in [990562699056402462,991655147442802737]):
+    if(message.channel.id in [channel_id["sfpd_imgur"]]):
         images = message.attachments
         if(len(images)>0):
             await message.delete()
             info_message = await message.channel.send(embed=imagur_upload_embed_generator(discord,"Uploading your images","Please wait for a while"))
             imgur_result = await imgur_hanlder(images)
             await info_message.edit(embed=imagur_upload_embed_generator(discord,"Uploaded Successfully","Premanent link has been sent to you via DIRECT MESSAGE"))
-            await asyncio.sleep(3)
             await message.author.send(embed = imagur_upload_embed_generator(discord,"Your Post","Hello there, Your images has been uploaded successfully",True,imgur_result))
+            await asyncio.sleep(3)
             await info_message.delete()
         else:
             pass
@@ -55,14 +57,11 @@ async def on_message(message):
 
 @client.event
 async def on_member_join(member):
-
     is_old_user = is_registered_user(member.id)
     print(bool(is_old_user))
     if(bool(is_old_user)):
         async with aiohttp.ClientSession() as session:
-            #site_url = 'https://bzone-bot-api.herokuapp.com/playerinfo/{}'.format(player_name)
-            #site_url= "https://bzone-bot-api-2.herokuapp.com/verify/{}".format(player_name)
-            site_url = 'http://localhost:3000/verify/{}'.format(is_old_user["player_name"])
+            site_url = f'{global_url}/verify/{is_old_user["player_name"]}'
             async with session.get(site_url) as resp:
                 is_valid_faction_member =  await resp.json()
 
@@ -113,7 +112,7 @@ async def on_member_join(member):
 
 
 @client.event
-async def on_command_errors(ctx,error):
+async def on_command_error(ctx,error):
 
     def get_error_embed(error):
         if(error == "MissingRequiredArgument"):
@@ -146,8 +145,9 @@ async def on_command_errors(ctx,error):
     elif isinstance(error,commands.CommandNotFound):
         await ctx.reply(embed = get_error_embed("CommandNotFound"))
 
-    # elif isinstance(error,commands.CommandInvokeError):
-    #     await ctx.reply(embed = get_error_embed("MissingPermissions"))
+    elif isinstance(error,commands.CommandInvokeError):
+        print(error)
+        await ctx.reply(embed = get_error_embed("CommandInvokeError"))
 
     else:
         raise error
@@ -188,6 +188,15 @@ async def spamcommand(ctx,limit,*,msg):
         ctx.reply("Error")
             
 
+
+
+
+@client.command()
+async def initheroku(ctx):
+    embed = discord.Embed(
+        title=""
+    )
+
 #------------------------------- Utility Commands-Ends ----------------------------------
 
 
@@ -196,9 +205,7 @@ async def spamcommand(ctx,limit,*,msg):
 
 @client.command(aliases = ["pi","id"])
 async def playerinfo(ctx,player_name):
-
     try:
-
         embed = discord.Embed(
             description="**Fetching Your In-Game data** \n Please wait for a while",
             color=discord.Colour.random()
@@ -208,9 +215,7 @@ async def playerinfo(ctx,player_name):
         data={}
         time.sleep(5)
         async with aiohttp.ClientSession() as session:
-            #site_url = 'https://bzone-bot-api.herokuapp.com/playerinfo/{}'.format(player_name)
-            site_url= "https://bzone-bot-api-2.herokuapp.com/playerinfo/{}".format(player_name)
-            #site_url = 'http://localhost:3000/playerinfo/{}'.format(player_name)
+            site_url = f'{global_url}/playerinfo/{player_name}'
             async with session.get(site_url) as resp:
                 data = await resp.json()
                 await playerinfo_command.playerinfo_func(discord,ctx,data)
@@ -239,8 +244,7 @@ async def factions(ctx):
     try:
             time.sleep(5)
             async with aiohttp.ClientSession() as session:
-                site_url= "https://bzone-bot-api-2.herokuapp.com/factions"
-                #site_url = 'http://localhost:3000/factions'
+                site_url = f'{global_url}/factions'
                 async with session.get(site_url) as resp:
                     data = await resp.json()
                     await factions_command.factions(data,discord,ctx)
@@ -267,8 +271,7 @@ async def leaders(ctx):
     try:
             time.sleep(5)
             async with aiohttp.ClientSession() as session:
-                site_url= "https://bzone-bot-api-2.herokuapp.com/leaders"
-                #site_url = 'http://localhost:3000/leaders'
+                site_url = f'{global_url}/leaders'
                 async with session.get(site_url) as resp:
                     data = await resp.json()
                     await leaders_command.leaders(data,discord,ctx)
@@ -294,8 +297,7 @@ async def helpers(ctx):
     try:
             time.sleep(5)
             async with aiohttp.ClientSession() as session:
-                site_url= "https://bzone-bot-api-2.herokuapp.com/helpers"
-                #site_url = 'http://localhost:3000/helpers'
+                site_url = f'{global_url}/helpers'
                 async with session.get(site_url) as resp:
                     data = await resp.json()
                     await helpers_command.helpers(data,discord,ctx)
@@ -315,50 +317,90 @@ async def helpers(ctx):
 
 @client.command(aliases = ["sv"])
 async def sverify(ctx,player_name):
-    channel_id = [990242620687122462,990485622403788841] 
-    #print(ctx.channel.id)
-    if(bool(is_registered_user(ctx.message.author.id))):
+    channel_id = [channel_id["sfpd_verification_channel"]] 
+    is_already_registered_user = is_registered_user(ctx.message.author.id)
+    if(bool(is_already_registered_user) and is_already_registered_user["player_discord_id"] == ctx.message.author.id):
         embed = discord.Embed(
             title="Oops, Something went wrong",
-            description="**It seems your RPG Account is already resigtered with another one discord id ** \n Please contact Dabrovsky if you like to make changes ",
+            description="**It seems your Discord Account is already resigtered with another one RPG Account ** \n Please contact Dabrovsky if you like to make changes ",
             color=discord.Colour.random()
         )
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
         await ctx.reply(embed = embed)
     else:
-        if(ctx.channel.id in channel_id):
-            try:
-
-                embed = discord.Embed(
-                    description="**Fetching Your In-Game data** \n Please wait for a while",
-                    color=discord.Colour.random()
-                )
-                embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
-                await ctx.reply(embed = embed)
-                data={}
-                time.sleep(3)
-                async with aiohttp.ClientSession() as session:
-                    #site_url = 'https://bzone-bot-api.herokuapp.com/playerinfo/{}'.format(player_name)
-                    #site_url= "https://bzone-bot-api-2.herokuapp.com/verify/{}".format(player_name)
-                    site_url = 'http://localhost:3000/verify/{}'.format(player_name)
-                    async with session.get(site_url) as resp:
-                        data = await resp.json()
-                        await verify(discord,ctx,data,player_name)
-            except :
-                embed = discord.Embed(
-                title="**Error occured**",
-                description="Please wait, there's some issue with backend server",
+        is_already_registered_rpg_username = is_registered_rpg_user(player_name)
+        print(is_already_registered_rpg_username)
+        if(bool(is_already_registered_rpg_username)):
+            embed = discord.Embed(
+                title="Oops, Something went wrong",
+                description="**It seems your RPG Account is already resigtered with another one discord id ** \n Please contact Dabrovsky if you like to make changes ",
                 color=discord.Colour.random()
-                )
-                embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
-                await ctx.reply(embed = embed)
+            )
+            embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+            await ctx.reply(embed = embed)
+        else:
+            if(ctx.channel.id in channel_id):
+                try:
+
+                    embed = discord.Embed(
+                        description="**Fetching Your In-Game data** \n Please wait for a while",
+                        color=discord.Colour.random()
+                    )
+                    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+                    await ctx.reply(embed = embed)
+                    data={}
+                    time.sleep(3)
+                    async with aiohttp.ClientSession() as session:
+                        site_url = f'{global_url}/verify/{player_name}'
+                        async with session.get(site_url) as resp:
+                            data = await resp.json()
+                            await verify(discord,ctx,data,player_name)
+                except :
+                    embed = discord.Embed(
+                    title="**Error occured**",
+                    description="Please wait, there's some issue with backend server",
+                    color=discord.Colour.random()
+                    )
+                    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+                    await ctx.reply(embed = embed)
+        
+
+
+
+
+@client.command()
+async def suggestion(ctx,message):
+    channel = client.get_channel(channel_id["sfpd_suggestion_channel_id"])
+    await channel.send(message)
+
+    embed = discord.Embed(
+        title="Successfully sent 👍"
+    )
+    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+    reply_message = await ctx.reply(embed = embed)
+    await asyncio.sleep(4)
+    await ctx.message.delete()
+    await reply_message.delete()
+
+
+
+
+@client.command()
+async def forum(ctx):
+    embed = discord.Embed(
+        title="[📕] SF Police Department Forum",
+        description="Serving with pride, Protecting with honor!",
+        color=discord.Colour.random()
+    )
+    embed.add_field(name="Topics",value=">>> [[ 📣 ] Important Announcements](https://forum.b-zone.ro/topic/123508-sf-police-department-%F0%9F%93%A3-anun%C5%A3uri-importante-important-announcements-%F0%9F%93%A3/)\n[[ 🎯 ] Challenge of the week](https://forum.b-zone.ro/topic/356270-sf-police-departament-misiunea-s%C4%83pt%C4%83m%C3%A2nii-challenge-of-the-week/)\n[[ 📌 ] Internal Rules ](https://forum.b-zone.ro/topic/422237-sf-police-department-%F0%9F%93%8C-regulament-intern-internal-rules-%F0%9F%93%8C/)\n[[ 🔖 ]Wanted, Arrest and Ticket List](https://forum.b-zone.ro/topic/122599-sf-police-department-wanted-arrest-and-ticket-list/)\n[[ 🎫 ] Training Pass Requests ](https://forum.b-zone.ro/topic/384352-sf-police-department-%F0%9F%9F%A2-%C3%AEnvoiri-pass-requests-%F0%9F%9F%A2/)\n[[ 👮‍♂️ ] Officers of the week ](https://forum.b-zone.ro/topic/430679-sf-police-department-ofi%C8%9Berii-s%C4%83pt%C4%83m%C3%A2nii-officers-of-the-week/)\n")
+    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+    await ctx.reply(embed=embed)
 
 
 
 @client.command()
 async def t(ctx):
-    await ctx.reply("Hi")
-    await imgur_hanlder()
+    await scrapper()
 
 
 

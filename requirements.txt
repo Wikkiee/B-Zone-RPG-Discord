@@ -3,5 +3,6 @@ async-generator==1.10
 async-timeout==3.0.1
 discord.py @ git+https://github.com/Rapptz/discord.py@723584ca19e34604798043d6fa265785af794ebd
 python-dotenv==0.20.0
+pymongo
 
 

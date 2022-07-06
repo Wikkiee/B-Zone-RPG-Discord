@@ -1,6 +1,6 @@
 
 from pymongo import MongoClient
-import os
+import re
 
 client = MongoClient('mongodb+srv://wikkie:vignesh7550@b-zone-discord-bot-db.gr1zx.mongodb.net/?retryWrites=true&w=majority')
 db = client.rpg_users_discord_database
@@ -23,10 +23,17 @@ def is_registered_user(user_id):
     result = users_collection.find_one({"player_discord_id":user_id})
     return result
 
+def is_registered_rpg_user(player_name):
+    result = users_collection.find_one({'player_name': re.compile('^' + re.escape(player_name) + '$', re.IGNORECASE)})
+    return result
+    
+
 def update_player_faction_rank(user_id,faction_rank):
     result = users_collection.find_one_and_update({"player_discord_id":user_id},{"$set":{"faction_rank":faction_rank}})
     result = list(result)
     return len(result)
+
+
 def update_player_faction_name(user_id,faction_name):
     result = users_collection.find_one_and_update({"player_discord_id":user_id},{"$set":{"faction_name":faction_name}})
     result = list(result)

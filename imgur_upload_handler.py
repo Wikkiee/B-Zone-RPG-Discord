@@ -3,7 +3,6 @@ import os
 import requests
 
 async def imgur_hanlder(image_url_list):
-    print("Executed")
     API_ENDPOINT = "https://api.imgur.com/3"
     headers = {
         "Authorization":f'Client-ID {os.environ.get("CLIENT_ID")}'
@@ -48,11 +47,8 @@ async def imgur_hanlder(image_url_list):
         "first_image_link":uploaded_images_link[0],
         "album_post_link":res["data"]["link"]
         }
-    print()
 
 
-    print("Finised")
-    print("Check 2")
     return album_link
 
 
