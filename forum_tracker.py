@@ -33,4 +33,4 @@ async def tracker(client,discord):
                                             # last_link = forum_post_data["post_link"]
                                             await channel.send(f'<@&{sfpd_roles["verified"]}>',embed = forum_tracker_post_embed(forum_post_data))
                                 else:
-                                    print("Other data")
+                                    print("[Forum Tracker Task]: No new data ... back to loog")
