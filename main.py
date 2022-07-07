@@ -213,6 +213,7 @@ async def playerinfo(ctx,player_name):
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
         await ctx.reply(embed = embed)
         data={}
+        asyncio.sleep(1)
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://www.rpg.b-zone.ro/players/general/{player_name}') as resp:
                 content = await resp.text()
