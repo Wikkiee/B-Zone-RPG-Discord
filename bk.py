@@ -109,3 +109,36 @@
     #                 print(total_time)
     #         else:
     #             print("player not found")
+
+
+
+
+                        # time.sleep(3)
+                    # async with aiohttp.ClientSession() as session:
+                    #     site_url = f'{global_url}/verify/{player_name}'
+                    #     async with session.get(site_url) as resp:
+                    #         data = await resp.json()
+                            # await verify(discord,ctx,data,player_name)
+
+
+
+# @client.command(aliases = ["sp"])
+# async def spamcommand(ctx,limit,*,msg):
+#     button = Button(label="Click me",style=discord.ButtonStyle.primary)
+#     view = View()
+#     view.add_item(button)
+#     try:
+#         if ctx.author.id == 491251010656927746:
+#             for i in range(1,int(limit)+1):
+#                 print("User name : {} \nUser ID : {}".format(ctx.author,ctx.author.id))
+#                 await ctx.send(msg,view=view)
+#         elif ctx.author.id == 664492070336987168:
+#             for i in range(1,int(limit)+1):
+#                 print("User name : {} \nUser ID : {}".format(ctx.author,ctx.author.id))
+#                 await ctx.send(msg,view=view)
+#         else:
+#             print("User name : {} \n User ID : {}".format(ctx.author,ctx.author.id))
+#             await ctx.reply("You are not authorized to use this command...")
+#     except:
+#         ctx.reply("Error")
+            

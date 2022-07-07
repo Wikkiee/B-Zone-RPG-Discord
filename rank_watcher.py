@@ -2,27 +2,53 @@ import aiohttp
 from database import get_players_data,update_player_faction_rank,update_player_faction_name,update_player_other_faction
 from roles import get_rank_role,sfpd_roles
 from unit_functions import remove_role_function ,global_url
-async def watcher(client,asyncio):
+from bs4 import BeautifulSoup
+
+async def watcher(client,discord,asyncio):
 
     print("Rank Watcher Task : Started")
 
     while True:
-        delay = 1
-        #print(f"Stopped for {delay}")
+        delay = 10
+        print(f"[Rank Watcher Task]: Stopped for {delay}")
         await asyncio.sleep(delay)
-        #print("Now resumed....")
+        print("[Rank Watcher Task]:Looping again...")
         players_list = get_players_data()
         if(len(players_list) >0):
             for player in players_list:
+                await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'{player["player_name"]} | {player["faction_name"]}\'s {player["faction_rank"]}'))
+                await asyncio.sleep(delay)
                 guild = client.get_guild(player["player_guild_id"])
                 role_list = await guild.fetch_roles()
                 member = guild.get_member(player["player_discord_id"])
                 if(bool(member)):
                     await asyncio.sleep(0)
+                    is_valid_faction_member={}
                     async with aiohttp.ClientSession() as session:
-                        site_url = f'{global_url}/verify/{player["player_name"]}'
-                        async with session.get(site_url) as resp:
-                            is_valid_faction_member =  await resp.json()
+                        async with session.get(f'https://www.rpg.b-zone.ro/players/faction/{player["player_name"]}') as resp:
+                            content = await resp.text()
+                            doc = BeautifulSoup(content, "html.parser")
+                            faction_name = (doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].a == None) and doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].string.strip() or doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].a.string.strip()
+                            if(faction_name == "Civilian"):
+                                is_valid_faction_member = {"is_civilian":1,"other_faction":1}
+                            elif(faction_name == "SF School Instructors"):
+                                is_valid_faction_member = {"other_faction":1}
+                                #  return{
+                                #      faction_name:"SF School Instructors",
+                                #      faction_rank:doc.select("#FactionWrapper > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                                #      faction_warn:doc.select("#FactionWrapper > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
+                                #      other_faction:0
+                                #  }
+                            elif(faction_name == "SFPD"):
+                                is_valid_faction_member = {
+                                    "faction_name":"SFPD",
+                                    "faction_rank":doc.select("#FactionWrapper > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                                    "faction_warn":doc.select("#FactionWrapper > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
+                                    "other_faction":0
+                                }
+                            else:
+                                is_valid_faction_member = {"other_faction":1}
+
                             if(player["faction_name"]=="" and player["faction_rank"]==""):
                                     if(is_valid_faction_member["other_faction"]==0):
                                         if(is_valid_faction_member["faction_name"]=="SFPD"):

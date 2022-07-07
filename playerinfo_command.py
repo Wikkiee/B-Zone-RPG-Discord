@@ -1,5 +1,5 @@
 
-import discord
+
 from discord.ui import View,Button
 
 
@@ -35,7 +35,10 @@ async def playerinfo_func(discord,ctx,data,total_execution_time):
         player_info_embed.add_field(name="Hours played",value="**`{}`**".format(data["hours_played"]),inline=True)
         player_info_embed.add_field(name="Hours played this month",value="**`{}`**".format(data["hours_played_this_month"]),inline=True)
         player_info_embed.add_field(name="RHours played this month",value="**`{}`**".format(data["real_hours_this_month"]),inline=True)
-        player_info_embed.add_field(name="Married / Status",value="**`{}`**".format(data["married"]),inline=True)
+        if(data["forum_profile_link"]!=False):
+            player_info_embed.add_field(name="Forum Profile",value=f'[Click to PM]({data["forum_profile_link"]})',inline=True) 
+        else:
+            player_info_embed.add_field(name="Forum Profile",value="Not added",inline=True) 
         player_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
 
         faction_info_embed.set_author(name=ctx.author.display_name,icon_url=ctx.author.display_avatar)

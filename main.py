@@ -1,5 +1,7 @@
 from distutils.log import info
 from pyexpat.errors import messages
+import traceback
+from turtle import title
 import aiohttp
 import asyncio
 import os
@@ -37,14 +39,14 @@ client.remove_command("help")
 async def on_ready():
     print("Discord Bot has logged in as {0.user}".format(client))
     client.loop.create_task(status_task(client,asyncio,discord))
-    #client.loop.create_task(training_reminder(client))
-    #client.loop.create_task(watcher(client,asyncio))
-    #client.loop.create_task(tracker(client,discord))
+    client.loop.create_task(training_reminder(client))
+    client.loop.create_task(watcher(client,discord,asyncio))
+    client.loop.create_task(tracker(client,discord))
 #------------------------------- Utility Commands-Ends ----------------------------------
 
 @client.event
 async def on_message(message):
-    if(message.channel.id in [channel_id["sfpd_imgur"]]):
+    if(message.channel.id in [channel_id["sfpd_imgur"],959138134413684840]):
         images = message.attachments
         if(len(images)>0):
             await message.delete()
@@ -64,10 +66,33 @@ async def on_member_join(member):
     is_old_user = is_registered_user(member.id)
     print(bool(is_old_user))
     if(bool(is_old_user)):
+        is_valid_faction_member={}
         async with aiohttp.ClientSession() as session:
-            site_url = f'{global_url}/verify/{is_old_user["player_name"]}'
-            async with session.get(site_url) as resp:
-                is_valid_faction_member =  await resp.json()
+            async with session.get(f'https://www.rpg.b-zone.ro/players/faction/{is_old_user["player_name"]}') as resp:
+                content = await resp.text()
+                doc = BeautifulSoup(content, "html.parser")
+                faction_name = (doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].a == None) and doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].string.strip() or doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].a.string.strip()
+                if(faction_name == "Civilian"):
+                    is_valid_faction_member = {"is_civilian":1,"other_faction":1}
+                elif(faction_name == "SF School Instructors"):
+                    is_valid_faction_member = {"other_faction":1}
+                    #  return{
+                    #      faction_name:"SF School Instructors",
+                    #      faction_rank:doc.select("#FactionWrapper > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                    #      faction_warn:doc.select("#FactionWrapper > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
+                    #      other_faction:0
+                    #  }
+                elif(faction_name == "SFPD"):
+                    is_valid_faction_member = {
+                        "faction_name":"SFPD",
+                        "faction_rank":doc.select("#FactionWrapper > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                        "faction_warn":doc.select("#FactionWrapper > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
+                        "other_faction":0
+                    }
+                else:
+                    is_valid_faction_member = {"other_faction":1}
+                print(is_valid_faction_member)
+
 
                 if(is_valid_faction_member["other_faction"]!=1):
                     if(is_valid_faction_member["faction_name"] == is_old_user["faction_name"]):
@@ -116,21 +141,28 @@ async def on_member_join(member):
 
 
 @client.event
-async def on_command_error(ctx,error):
-
-    def get_error_embed(error):
+async def on_command_error(ctx,error = ""):
+    def get_error_embed(error,message):
         if(error == "MissingRequiredArgument"):
+            title = "Missing Required Argument"
             description = "Please enter all the required arugments"
         elif(error == "MissingPermissions"):
+            title = "Missing Permissions"
             description = "Please update my permission and then use that command"
         elif(error == "MemberNotFound"):
+            title = "Member Not Found"
             description = "Please mention the valid member (@mention)"
         elif(error == "CommandNotFound"):
+            title = "Command Not Found"
             description = "Please use the valid command, use [!help] to know more"
         elif(error == "CommandInvokeError"):
+            title = "Ops An Error Occured"
             description = "Please wait, there's some issue with backend server"
+        elif(error == "CommandOnCooldown"):
+            title = "Command On Cooldown"
+            description = message
         embed = discord.Embed(
-        title="**Error occured**",
+        title=f'**{title}**',
         description=description,
         color=discord.Colour.random()
         )
@@ -138,20 +170,25 @@ async def on_command_error(ctx,error):
         return embed
 
     if isinstance(error,commands.MissingPermissions):
-        await ctx.reply(embed = get_error_embed("MissingPermissions"))
+        await ctx.reply(embed = get_error_embed("MissingPermissions",error))
 
     elif isinstance(error,commands.MissingRequiredArgument):
-        await ctx.reply(embed = get_error_embed("MissingRequiredArgument"))
+        await ctx.reply(embed = get_error_embed("MissingRequiredArgument",error))
     
     elif isinstance(error,commands.MemberNotFound):
-        await ctx.reply(embed = get_error_embed("MemberNotFound"))
+        await ctx.reply(embed = get_error_embed("MemberNotFound",error))
 
     elif isinstance(error,commands.CommandNotFound):
-        await ctx.reply(embed = get_error_embed("CommandNotFound"))
+        print(error)
+        await ctx.reply(embed = get_error_embed("CommandNotFound",error))
 
     elif isinstance(error,commands.CommandInvokeError):
         print(error)
-        await ctx.reply(embed = get_error_embed("CommandInvokeError"))
+        await ctx.reply(embed = get_error_embed("CommandInvokeError",error))
+    
+    elif isinstance(error,commands.CommandOnCooldown):
+        print(error)
+        await ctx.reply(embed = get_error_embed("CommandOnCooldown",error))
 
     else:
         raise error
@@ -171,29 +208,6 @@ async def pfp(ctx,user:discord.Member):
 
 
 
-@client.command(aliases = ["sp"])
-async def spamcommand(ctx,limit,*,msg):
-    button = Button(label="Click me",style=discord.ButtonStyle.primary)
-    view = View()
-    view.add_item(button)
-    try:
-        if ctx.author.id == 491251010656927746:
-            for i in range(1,int(limit)+1):
-                print("User name : {} \nUser ID : {}".format(ctx.author,ctx.author.id))
-                await ctx.send(msg,view=view)
-        elif ctx.author.id == 664492070336987168:
-            for i in range(1,int(limit)+1):
-                print("User name : {} \nUser ID : {}".format(ctx.author,ctx.author.id))
-                await ctx.send(msg,view=view)
-        else:
-            print("User name : {} \n User ID : {}".format(ctx.author,ctx.author.id))
-            await ctx.reply("You are not authorized to use this command...")
-    except:
-        ctx.reply("Error")
-            
-
-
-
 
 
 #------------------------------- Utility Commands-Ends ----------------------------------
@@ -203,6 +217,7 @@ async def spamcommand(ctx,limit,*,msg):
 
 
 @client.command(aliases = ["pi","id"])
+@commands.cooldown(1, 5, commands.BucketType.guild)
 async def playerinfo(ctx,player_name):
     start_time = time.time()
     try:
@@ -213,11 +228,10 @@ async def playerinfo(ctx,player_name):
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
         await ctx.reply(embed = embed)
         data={}
-        asyncio.sleep(1)
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://www.rpg.b-zone.ro/players/general/{player_name}') as resp:
                 content = await resp.text()
-                doc = BeautifulSoup(content, 'html.parser')
+                doc = BeautifulSoup(content, "html.parser")
                 rpg_player_ign = doc.select(".tooltipstered a")
                 print(len(rpg_player_ign))
                 if(len(rpg_player_ign) != 0):
@@ -234,10 +248,10 @@ async def playerinfo(ctx,player_name):
                             "real_hours_this_month":doc.select("#generalTableLeft > table > tr:nth-child(7) > td:nth-child(2)")[0].string.strip(),
                             "respect":doc.select("#generalTableLeft > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
                             "hours_played":doc.select("#generalTableLeft > table > tr:nth-child(5) > td:nth-child(2)")[0].string.strip(),
-                            "married":doc.select("#generalTableRight > table > tr.firstRow > td:nth-child(2)")[0].string.strip(),
+                            "forum_profile_link":(len(doc.select("#contentPage > div.subPageTitle.pageTitle > div > a")) == 1)and doc.select("#contentPage > div.subPageTitle.pageTitle > div > a")[0]["href"] or False,
                             "playerFound":1,
                             "message":0
-                                            
+     
                             }
                     async with session.get(f'https://www.rpg.b-zone.ro/players/faction/{player_name}') as resp:
                         content = await resp.text()
@@ -262,8 +276,6 @@ async def playerinfo(ctx,player_name):
                                 })
                         else:
                             print("Player is civilian")
-                    print('\n ======> Final Data <====== : \n')
-                    print(data)
                     end_time = time.time()
                     total_time = "Result in : {} seconds".format(int(end_time - start_time)) 
                     print(total_time)
@@ -274,7 +286,8 @@ async def playerinfo(ctx,player_name):
                     print(total_time)
                     await playerinfo_command.playerinfo_func(discord,ctx,{"playerFound":0},total_time)
 
-    except:
+    except Exception:
+        print(traceback.print_exc())
         embed = discord.Embed(
         title="**Error occured**",
         description="Please wait, there's some issue with backend server",
@@ -289,6 +302,7 @@ async def playerinfo(ctx,player_name):
 
 
 @client.command()
+@commands.cooldown(1, 5, commands.BucketType.guild)
 async def factions(ctx):
     embed = discord.Embed(
         description="**Fetching the factions details** \n Please wait for a while",
@@ -316,6 +330,7 @@ async def factions(ctx):
 
 
 @client.command()
+@commands.cooldown(1, 5, commands.BucketType.guild)
 async def leaders(ctx):
     embed = discord.Embed(
         description="**Fetching the leaders details** \n Please wait for a while",
@@ -342,6 +357,7 @@ async def leaders(ctx):
 
 
 @client.command(aliases = ["admins"])
+@commands.cooldown(1, 5, commands.BucketType.guild)
 async def helpers(ctx):
     embed = discord.Embed(
         description="**Fetching Staffs details** \n Please wait for a while",
@@ -371,8 +387,9 @@ async def helpers(ctx):
 
 
 @client.command(aliases = ["sv"])
+@commands.cooldown(1, 5, commands.BucketType.guild)
 async def sverify(ctx,player_name):
-    channel_id = [channel_id["sfpd_verification_channel"]] 
+    channels_id = [channel_id["sfpd_verification_channel"]] 
     is_already_registered_user = is_registered_user(ctx.message.author.id)
     if(bool(is_already_registered_user) and is_already_registered_user["player_discord_id"] == ctx.message.author.id):
         embed = discord.Embed(
@@ -394,9 +411,8 @@ async def sverify(ctx,player_name):
             embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
             await ctx.reply(embed = embed)
         else:
-            if(ctx.channel.id in channel_id):
+            if(ctx.channel.id in channels_id):
                 try:
-
                     embed = discord.Embed(
                         description="**Fetching Your In-Game data** \n Please wait for a while",
                         color=discord.Colour.random()
@@ -404,11 +420,31 @@ async def sverify(ctx,player_name):
                     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
                     await ctx.reply(embed = embed)
                     data={}
-                    time.sleep(3)
                     async with aiohttp.ClientSession() as session:
-                        site_url = f'{global_url}/verify/{player_name}'
-                        async with session.get(site_url) as resp:
-                            data = await resp.json()
+                        async with session.get(f'https://www.rpg.b-zone.ro/players/faction/{player_name}') as resp:
+                            content = await resp.text()
+                            doc = BeautifulSoup(content, "html.parser")
+                            faction_name = (doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].a == None) and doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].string.strip() or doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].a.string.strip()
+                            if(faction_name == "Civilian"):
+                                data = {"is_civilian":1,"other_faction":1}
+                            elif(faction_name == "SF School Instructors"):
+                                data = {"other_faction":1}
+                                #  return{
+                                #      faction_name:"SF School Instructors",
+                                #      faction_rank:doc.select("#FactionWrapper > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                                #      faction_warn:doc.select("#FactionWrapper > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
+                                #      other_faction:0
+                                #  }
+                            elif(faction_name == "SFPD"):
+                                data = {
+                                    "faction_name":"SFPD",
+                                    "faction_rank":doc.select("#FactionWrapper > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                                    "faction_warn":doc.select("#FactionWrapper > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
+                                    "other_faction":0
+                                }
+                            else:
+                                data = {"other_faction":1}
+                            print(data)
                             await verify(discord,ctx,data,player_name)
                 except :
                     embed = discord.Embed(
@@ -424,12 +460,21 @@ async def sverify(ctx,player_name):
 
 
 @client.command()
-async def suggestion(ctx,message):
+@commands.cooldown(1, 600, commands.BucketType.guild)
+async def suggestions(ctx,*,message):
     channel = client.get_channel(channel_id["sfpd_suggestion_channel_id"])
-    await channel.send(message)
-
     embed = discord.Embed(
-        title="Successfully sent 👍"
+        title=f'Suggestion from {ctx.author}',
+        description=f'[Message] : **{message}**',
+        color=discord.Colour.random()
+    )
+    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+    await channel.send(embed = embed)
+    
+    embed = discord.Embed(
+        title="Successfully sent 👍",
+        description="Thanks for sharing your priceless suggestion / report 💖",
+        color=discord.Colour.random()
     )
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
     reply_message = await ctx.reply(embed = embed)
@@ -452,13 +497,6 @@ async def forum(ctx):
     await ctx.reply(embed=embed)
 
 
-
-@client.command()
-async def t(ctx):
-    print()
-
-
-
 @client.command()
 async def cdb(ctx):
     clean_database()
@@ -475,6 +513,65 @@ async def help(ctx):
  
 
 #------------------------------- Help Commands-Ends ----------------------------------
+
+
+#------------------------------- Experiment Commands-starts ----------------------------------
+
+@client.command(aliases=['mimic', 'copy', 'repeat'])
+@commands.cooldown(1, 5, commands.BucketType.guild)
+# """ `amount` will be a user-inputted integer """
+async def spam(ctx, amount:int, *, message):
+    # """ We can simplify the conditional to: if the amount is less than 25,
+    #     send the message `amount` number of times """
+    if amount < 25:
+        for _ in range(amount):
+            await ctx.send(message)
+    # """ If `amount` is anything over or equal to 25, send the error message below """
+    else:
+        await ctx.reply('the limit to the amount of messages you can spam is 25')
+
+
+
+
+# @client.command()
+# async def e(ctx,emojii):
+#     try:
+#         guild = client.get_guild(993162311315497010)
+#         emojies = guild.emojis
+#         for emoji in emojies:
+#             print(emoji.name) 
+#             if(emoji.name == "test"):
+#                 channel = ctx.channel
+#                 send_emoji = client.get_emoji(emoji.id)
+#                 wh = await channel.create_webhook(name=ctx.author.name,reason="Experiment")
+#                 await wh.send(content=send_emoji,username=ctx.author.name,avatar_url=ctx.author.avatar)
+#         # emoji = client.get_emoji(994422365884776469)
+#     except Exception as e:
+#         print(traceback.format_stack)
+#         print(e.__class__)
+#------------------------------- Experiment Commands-ends ----------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 client.run(os.environ.get("TOKEN"))

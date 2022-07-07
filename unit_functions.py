@@ -1,20 +1,15 @@
 from email.mime import image
 from roles import sfpd_roles
 import discord
-async def remove_role_function(member,guild):
-    role_list = member.roles
-    role_list = list(role_list)
-    ignore_roles_list = [sfpd_roles["verified"],990488671553716244,990484473080582205]
-    for role in role_list:
-        if(role.id in ignore_roles_list ):
-            pass
-        else:
-            remove_role = guild.get_role(role.id)
-            await member.remove_roles(remove_role)
+
+
+
+#------------------------ Variables Config --------------------------------
+
 
 global_url = "https://bzone-rpg-api.herokuapp.com"
+#global_url = 'http://localhost:3000'
 
-# global_url = 'http://localhost:3000'
 
 guild_id = {
     "sfpd":990484473080582205,
@@ -27,6 +22,31 @@ channel_id = {
     "sfpd_verification_channel":990485622403788841,
     "sfpd_suggestion_channel_id":993778808090021998
 }
+
+
+#------------------------ Variables Config -End --------------------------------
+
+
+
+
+
+#------------------------ Small functions --------------------------------
+
+
+async def remove_role_function(member,guild):
+    role_list = member.roles
+    role_list = list(role_list)
+    ignore_roles_list = [sfpd_roles["verified"],990488671553716244,990484473080582205]
+    for role in role_list:
+        if(role.id in ignore_roles_list ):
+            pass
+        else:
+            remove_role = guild.get_role(role.id)
+            await member.remove_roles(remove_role)
+
+
+
+
 
 def role_update_embed_generator(discord,name,faction,rank):
     description = ""
@@ -66,3 +86,18 @@ def get_training_reminder_announcement_embed(date,time):
     embed.add_field(name="Note :",value="You have the possibility to opt out of a maximum of one activity this month. Visit the following to submit the pass request: [[Click Me](https://forum.b-zone.ro/topic/384352-sf-police-department-învoiri-pass-requests/)]",inline=False)
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
     return embed
+
+def forum_tracker_post_embed(forum_post_data):
+    embed = discord.Embed(
+            title= f'**{forum_post_data["faction_name"]}**',
+            description=f'**Topic : {forum_post_data["forum_topic"]}**' ,
+            color=discord.Colour.random(),
+            url=forum_post_data["post_link"]
+            )
+    embed.add_field(name=f'[📣] New Content by {forum_post_data["author_name"]}',value=f'_New content has been posted on forum. Follow up link here: [click me]({forum_post_data["post_link"]}) \n <@&{sfpd_roles["verified"]}>_',inline=False)
+    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+    return embed
+
+
+
+#------------------------ Small functions-End --------------------------------
