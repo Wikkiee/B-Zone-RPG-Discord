@@ -19,7 +19,11 @@ from forum_tracker import tracker
 from unit_functions import role_update_embed_generator,imagur_upload_embed_generator,channel_id,global_url
 from imgur_upload_handler import imgur_hanlder
 from reminder import training_reminder
-from web_scrapper import scrapper
+from bs4 import BeautifulSoup
+
+
+
+# from web_scraper import scraper
 
 load_dotenv(find_dotenv())
 
@@ -191,11 +195,6 @@ async def spamcommand(ctx,limit,*,msg):
 
 
 
-@client.command()
-async def initheroku(ctx):
-    embed = discord.Embed(
-        title=""
-    )
 
 #------------------------------- Utility Commands-Ends ----------------------------------
 
@@ -205,6 +204,7 @@ async def initheroku(ctx):
 
 @client.command(aliases = ["pi","id"])
 async def playerinfo(ctx,player_name):
+    start_time = time.time()
     try:
         embed = discord.Embed(
             description="**Fetching Your In-Game data** \n Please wait for a while",
@@ -213,12 +213,66 @@ async def playerinfo(ctx,player_name):
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
         await ctx.reply(embed = embed)
         data={}
-        time.sleep(5)
         async with aiohttp.ClientSession() as session:
-            site_url = f'{global_url}/playerinfo/{player_name}'
-            async with session.get(site_url) as resp:
-                data = await resp.json()
-                await playerinfo_command.playerinfo_func(discord,ctx,data)
+            async with session.get(f'https://www.rpg.b-zone.ro/players/general/{player_name}') as resp:
+                content = await resp.text()
+                doc = BeautifulSoup(content, 'html.parser')
+                rpg_player_ign = doc.select(".tooltipstered a")
+                print(len(rpg_player_ign))
+                if(len(rpg_player_ign) != 0):
+                    full_name =len(rpg_player_ign) > 1 and f'{rpg_player_ign[0].string}{rpg_player_ign[1].string}' or rpg_player_ign[0].string
+                    print("player found")            
+                    data = {
+                            "ign": full_name,
+                            "profile_url":f'https://www.rpg.b-zone.ro/players/general/{player_name}',
+                            "avatar_url": doc.select(".skinImg")[0]["src"],
+                            "current_status": doc.select("#wrapper > div.generalRight > table > tr.firstRow > td:nth-child(2) > div > div > div > div:nth-child(1) > img")[0]["alt"],
+                            "level":doc.select("#generalTableLeft > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                            "last_login":doc.select("#wrapper > div.generalRight > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                            "hours_played_this_month":doc.select("#generalTableLeft > table > tr:nth-child(6) > td:nth-child(2)")[0].string.strip(),
+                            "real_hours_this_month":doc.select("#generalTableLeft > table > tr:nth-child(7) > td:nth-child(2)")[0].string.strip(),
+                            "respect":doc.select("#generalTableLeft > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
+                            "hours_played":doc.select("#generalTableLeft > table > tr:nth-child(5) > td:nth-child(2)")[0].string.strip(),
+                            "married":doc.select("#generalTableRight > table > tr.firstRow > td:nth-child(2)")[0].string.strip(),
+                            "playerFound":1,
+                            "message":0
+                                            
+                            }
+                    async with session.get(f'https://www.rpg.b-zone.ro/players/faction/{player_name}') as resp:
+                        content = await resp.text()
+                        doc = BeautifulSoup(content, 'html.parser')
+                        faction_name = (doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].a == None) and doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].string.strip() or doc.select("#FactionWrapper > table > tr:nth-child(1) > td:nth-child(2)")[0].a.string.strip()
+                        faction_data = {
+                            "faction_name":faction_name,
+                            "join_date": doc.select("#FactionWrapper > table > tr:nth-child(2) > td:nth-child(2)")[0].string.strip(),
+                            "rank": doc.select("#FactionWrapper > table > tr:nth-child(3) > td:nth-child(2)")[0].string.strip(),
+                            "faction_warns": doc.select("#FactionWrapper > table > tr:nth-child(4) > td:nth-child(2)")[0].string.strip(),
+                            "faction_punish": doc.select("#FactionWrapper > table > tr:nth-child(5) > td:nth-child(2)")[0].string.strip(),
+                            "faction_time": doc.select("#FactionWrapper > table > tr:nth-child(6) > td:nth-child(2)")[0].string.strip(),
+                            "faction_url" : (faction_name != 'Civilian') and doc.select("#FactionWrapper > table > tr.firstRow > td:nth-child(2) > a")[0]["href"] or None,
+                                }
+                        data.update(faction_data)
+                        if(faction_name != 'Civilian'):
+                            async with session.get(f'https://www.rpg.b-zone.ro/{data["faction_url"]}') as resp:
+                                content = await resp.text()
+                                doc = BeautifulSoup(content, 'html.parser')
+                                data.update({
+                                    "faction_logo_url":doc.select("#pageContent > p:nth-child(3) > img")[0]["src"]
+                                })
+                        else:
+                            print("Player is civilian")
+                    print('\n ======> Final Data <====== : \n')
+                    print(data)
+                    end_time = time.time()
+                    total_time = "Result in : {} seconds".format(int(end_time - start_time)) 
+                    print(total_time)
+                    await playerinfo_command.playerinfo_func(discord,ctx,data,total_time)
+                else:
+                    end_time = time.time()
+                    total_time = "Result in : {} seconds".format(int(end_time - start_time)) 
+                    print(total_time)
+                    await playerinfo_command.playerinfo_func(discord,ctx,{"playerFound":0},total_time)
+
     except:
         embed = discord.Embed(
         title="**Error occured**",
@@ -242,7 +296,7 @@ async def factions(ctx):
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
     await ctx.reply(embed = embed)
     try:
-            time.sleep(5)
+            time.sleep(8)
             async with aiohttp.ClientSession() as session:
                 site_url = f'{global_url}/factions'
                 async with session.get(site_url) as resp:
@@ -269,7 +323,7 @@ async def leaders(ctx):
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
     await ctx.reply(embed = embed)
     try:
-            time.sleep(5)
+            time.sleep(8)
             async with aiohttp.ClientSession() as session:
                 site_url = f'{global_url}/leaders'
                 async with session.get(site_url) as resp:
@@ -295,7 +349,7 @@ async def helpers(ctx):
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
     await ctx.reply(embed = embed)
     try:
-            time.sleep(5)
+            time.sleep(8)
             async with aiohttp.ClientSession() as session:
                 site_url = f'{global_url}/helpers'
                 async with session.get(site_url) as resp:
@@ -400,8 +454,7 @@ async def forum(ctx):
 
 @client.command()
 async def t(ctx):
-    await scrapper()
-
+    print()
 
 
 
@@ -427,21 +480,6 @@ client.run(os.environ.get("TOKEN"))
 
 
 
-
-
-
-
-
-
-
-#@client.command(aliases = ["termi"] )
-# async def terminate(ctx, password):
-#     print
-#     if int(password) == 123:
-#         await ctx.reply("Terminating...")
-#         await client.close()
-#     else:
-#         await ctx.reply("please enter the valid password")
 
 
 

@@ -7,7 +7,7 @@ from discord.ui import View,Button
 
 
 
-async def playerinfo_func(discord,ctx,data):
+async def playerinfo_func(discord,ctx,data,total_execution_time):
     view = View()
     if (data["playerFound"] == 1):
         player_info_embed = discord.Embed(
@@ -36,7 +36,7 @@ async def playerinfo_func(discord,ctx,data):
         player_info_embed.add_field(name="Hours played this month",value="**`{}`**".format(data["hours_played_this_month"]),inline=True)
         player_info_embed.add_field(name="RHours played this month",value="**`{}`**".format(data["real_hours_this_month"]),inline=True)
         player_info_embed.add_field(name="Married / Status",value="**`{}`**".format(data["married"]),inline=True)
-        player_info_embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        player_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
 
         faction_info_embed.set_author(name=ctx.author.display_name,icon_url=ctx.author.display_avatar)
         faction_info_embed.add_field(name="Faction Name",value="**`{}`**".format(data["faction_name"]),inline=True)
@@ -49,7 +49,7 @@ async def playerinfo_func(discord,ctx,data):
         # faction_info_embed.add_field(name="Recent Faction Logs",value="**Date \t Leader \t Faction \t Action\n{} \t {} \t {} \t {}\n**".format(data["faction_log"][0][1],data["faction_log"][1][1],data["faction_log"][2][1],data["faction_log"][3][1]),inline=False)
         
         
-        faction_info_embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        faction_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
 
 
 
@@ -77,12 +77,12 @@ async def playerinfo_func(discord,ctx,data):
 
     else:
         player_info_embed = discord.Embed(
-        color=discord.Color.random()
-        )
-        player_info_embed.add_field(name="Oops",
-        value="Player not found, Please enter the valid name",inline=True)
+        title="[❗] Ops no results",
+        description=f'Player not found, Please enter the valid name',
+        color=discord.Colour.random()
+    )
         view = None
-
+        player_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
     await ctx.reply(embed=player_info_embed,view = view)
 
 

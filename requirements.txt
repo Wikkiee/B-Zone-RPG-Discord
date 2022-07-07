@@ -4,5 +4,4 @@ async-timeout==3.0.1
 discord.py @ git+https://github.com/Rapptz/discord.py@723584ca19e34604798043d6fa265785af794ebd
 python-dotenv==0.20.0
 pymongo[srv]
-selenium==4.3.0
-webdriver-manager==3.8.0
+beautifulsoup4==4.11.1
