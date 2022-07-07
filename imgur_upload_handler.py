@@ -1,9 +1,59 @@
 
-# import os
-# import requests
-# import aiohttp
-# async def imgur_hanlder(image_url_list):
+import os
+import aiohttp
+async def imgur_hanlder(image_url_list):
+    print("[Imgur Task] : Task started")
+    API_ENDPOINT = "https://api.imgur.com/3"
+    headers = {
+        "Authorization":f'Client-ID {os.environ.get("CLIENT_ID")}'
+    }
+    data = {
+        "privacy":"hidden"
+    }
+    
+    
+    
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url = f'{API_ENDPOINT}/album', data = data,headers=headers) as resp:
+            res = await resp.json()
+            album_id = res["data"]["id"]
+            album_delete_hash_id = res["data"]["deletehash"]
 
+            uploaded_images_id = []
+            uploaded_images_deletehash_id = []
+            uploaded_images_link = []
+            for image in image_url_list:
+                image_post_data = {
+                    "image":image.url,
+                    "type":"url",
+                }
+                async with aiohttp.ClientSession() as session:
+                    async with session.post(url= f'{API_ENDPOINT}/upload',data=image_post_data,headers=headers) as resp:
+                        res = await resp.json()
+                        uploaded_images_link.append(res["data"]["link"])
+                        uploaded_images_id.append(res["data"]["id"])
+                        uploaded_images_deletehash_id.append(res["data"]["deletehash"])
+
+                        #https://api.imgur.com/3/
+                        album_image_add_data = {
+                            "deletehashes[]":uploaded_images_deletehash_id
+                        }
+                        async with aiohttp.ClientSession() as session:
+                            async with session.post(url= f'{API_ENDPOINT}/album/{album_delete_hash_id}/add',data=album_image_add_data,headers=headers) as resp:
+                                res = await resp.json()
+                                
+                                #https://api.imgur.com/3/album/{{albumHash}}
+                                async with aiohttp.ClientSession() as session:
+                                    async with session.get(url= f'{API_ENDPOINT}/album/{album_id}',headers=headers) as resp:
+                                        res = await resp.json()
+                                        print("\n Album links \n")
+                                        album_link = {
+                                            "first_image_link":uploaded_images_link[0],
+                                            "album_post_link":res["data"]["link"]
+                                            }
+
+                                        print("[Imgur Task] : Task completed ... Sending the link")
+                                        return album_link
 
 
 
