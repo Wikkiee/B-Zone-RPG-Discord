@@ -1,21 +1,17 @@
-from distutils.log import info
-from pyexpat.errors import messages
+
 import traceback
-from turtle import title
 import aiohttp
 import asyncio
 import os
 import time
 import discord
 from discord.ext import commands
-from discord.ui import Button,View
 from dotenv import load_dotenv,find_dotenv
-from discord.ext.commands import has_permissions, CheckFailure
-from database import insert_users_data,is_registered_user,clean_database,get_players_data,update_player_faction_rank,is_registered_rpg_user
+from database import is_registered_user,clean_database,update_player_faction_rank,is_registered_rpg_user
 from rank_verify import verify
 from status import status_task
 from roles import sfpd_roles,get_rank_role
-import dm_message,help_command,playerinfo_command,factions_command,leaders_command,helpers_command
+import help_command,playerinfo_command,factions_command,leaders_command,helpers_command
 from rank_watcher import watcher
 from forum_tracker import tracker
 from unit_functions import role_update_embed_generator,imagur_upload_embed_generator,channel_id,global_url
@@ -23,9 +19,6 @@ from imgur_upload_handler import imgur_hanlder
 from reminder import training_reminder
 from bs4 import BeautifulSoup
 
-
-
-# from web_scraper import scraper
 
 load_dotenv(find_dotenv())
 
@@ -517,38 +510,6 @@ async def help(ctx):
 
 #------------------------------- Experiment Commands-starts ----------------------------------
 
-@client.command(aliases=['mimic', 'copy', 'repeat'])
-@commands.cooldown(1, 5, commands.BucketType.guild)
-# """ `amount` will be a user-inputted integer """
-async def spam(ctx, amount:int, *, message):
-    # """ We can simplify the conditional to: if the amount is less than 25,
-    #     send the message `amount` number of times """
-    if amount < 25:
-        for _ in range(amount):
-            await ctx.send(message)
-    # """ If `amount` is anything over or equal to 25, send the error message below """
-    else:
-        await ctx.reply('the limit to the amount of messages you can spam is 25')
-
-
-
-
-# @client.command()
-# async def e(ctx,emojii):
-#     try:
-#         guild = client.get_guild(993162311315497010)
-#         emojies = guild.emojis
-#         for emoji in emojies:
-#             print(emoji.name) 
-#             if(emoji.name == "test"):
-#                 channel = ctx.channel
-#                 send_emoji = client.get_emoji(emoji.id)
-#                 wh = await channel.create_webhook(name=ctx.author.name,reason="Experiment")
-#                 await wh.send(content=send_emoji,username=ctx.author.name,avatar_url=ctx.author.avatar)
-#         # emoji = client.get_emoji(994422365884776469)
-#     except Exception as e:
-#         print(traceback.format_stack)
-#         print(e.__class__)
 #------------------------------- Experiment Commands-ends ----------------------------------
 
 

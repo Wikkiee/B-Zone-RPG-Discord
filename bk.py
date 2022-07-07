@@ -142,3 +142,48 @@
 #     except:
 #         ctx.reply("Error")
             
+
+
+# @client.command(aliases=['mimic', 'copy', 'repeat'])
+# @commands.cooldown(1, 5, commands.BucketType.guild)
+# # """ `amount` will be a user-inputted integer """
+# async def spam(ctx, amount:int, *, message):
+#     # """ We can simplify the conditional to: if the amount is less than 25,
+#     #     send the message `amount` number of times """
+#     if amount < 25:
+#         for _ in range(amount):
+#             await ctx.send(message)
+#     # """ If `amount` is anything over or equal to 25, send the error message below """
+#     else:
+#         await ctx.reply('the limit to the amount of messages you can spam is 25')
+
+
+
+
+# # @client.command()
+# # async def e(ctx,emojii):
+# #     try:
+# #         guild = client.get_guild(993162311315497010)
+# #         emojies = guild.emojis
+# #         for emoji in emojies:
+# #             print(emoji.name) 
+# #             if(emoji.name == "test"):
+# #                 channel = ctx.channel
+# #                 send_emoji = client.get_emoji(emoji.id)
+# #                 wh = await channel.create_webhook(name=ctx.author.name,reason="Experiment")
+# #                 await wh.send(content=send_emoji,username=ctx.author.name,avatar_url=ctx.author.avatar)
+# #         # emoji = client.get_emoji(994422365884776469)
+# #     except Exception as e:
+# #         print(traceback.format_stack)
+# #         print(e.__class__)
+
+
+
+# async def dm_messages(client,message):
+#         await client.process_commands(message)
+#         if(message.guild == None):
+#             if(message.author == client.user):
+#                 return
+#             else:
+#                 #print(message.content)
+#                 pass

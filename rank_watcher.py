@@ -1,7 +1,7 @@
 import aiohttp
 from database import get_players_data,update_player_faction_rank,update_player_faction_name,update_player_other_faction
 from roles import get_rank_role,sfpd_roles
-from unit_functions import remove_role_function ,global_url
+from unit_functions import remove_role_function
 from bs4 import BeautifulSoup
 
 async def watcher(client,discord,asyncio):
