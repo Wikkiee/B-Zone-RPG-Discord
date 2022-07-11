@@ -594,19 +594,7 @@ async def forum(ctx):
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
     await ctx.reply(embed=embed)
 
-@client.command()
-async def t(ctx):
-    channel = client.get_channel(channel_id["sfpd_reminder_channel"])
-    tm = await channel.send("Test")
-    time.sleep(3)
-    await tm.delete()
 
-
-
-@client.command()
-async def cdb(ctx):
-    clean_database()
-    await ctx.message.delete()
 
 #---------------------------- RPG Commands-Ends ----------------------------------
 
