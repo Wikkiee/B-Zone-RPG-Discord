@@ -6,20 +6,21 @@ import re
 client = MongoClient('mongodb+srv://wikkie:vignesh7550@b-zone-discord-bot-db.gr1zx.mongodb.net/?retryWrites=true&w=majority')
 db = client.rpg_users_discord_database
 users_collection = db.rpg_users_discord_collection
-# def get_db():
-#     db = 
-#     # col = db.my_collection
-#     # result = col.find()
-#     return db
+
 
 forum_collection = db.forum_tracker_link_collection
 
 def create_last_announcement_link():
-    result = forum_collection.insert_one({
-        "type":"forum",
-        "link":""
-    })
-    return result.acknowledged
+    collist = db.list_collection_names()
+    if "forum_tracker_link_collection" in collist:
+        print("The collection exists.")
+        return "The collection exists."
+    else:
+        forum_collection.insert_one({
+            "type":"forum",
+            "link":""
+        })
+        return "Collection Created successfully"
 
 def  update_last_announcement_link(link):
     result = forum_collection.find_one_and_update({'type':"forum"},{ '$set': { "link" :link } })

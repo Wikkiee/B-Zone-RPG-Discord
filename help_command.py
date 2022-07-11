@@ -15,5 +15,5 @@ async def help(discord,client,ctx):
     embed.add_field(name="[💖] B-zone Supports",value="[Vist RPG Site](https://www.rpg.b-zone.ro/) | [Forum](https://forum.b-zone.ro/) | [Discord](https://discord.gg/qtXwDC2H) | [Contact](https://discord.gg/fKDbRTuTpe) ",inline=False)
     embed.set_image(url="https://cdn.discordapp.com/attachments/961691415400820776/993049804793974914/ezgif.com-gif-maker_4.gif")
     embed.set_thumbnail(url=client.user.avatar)
-    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
     await ctx.send(embed=embed)

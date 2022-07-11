@@ -2,10 +2,11 @@ import calendar
 import datetime
 from unit_functions import get_training_reminder_announcement_embed,channel_id
 import asyncio
+from roles import sfpd_roles
 from datetime import datetime
 
 async def training_reminder(client):
-    print("Training Reminder Task : Started")
+    print("[Training Reminder Task] : Started\n")
     while True:
         print("Delayed for : 3600 sec")
         await asyncio.sleep(3600)
@@ -30,11 +31,11 @@ async def training_reminder(client):
         time = time.strftime("%X")
         print(f'Training Reminder Task : Date : {today_date}/{this_month}/{this_year} | Time : {time[:2]}')
         if(this_year == str(first_and_third_sunday[0])[:4] and this_month == str(first_and_third_sunday[0])[5:7]):
-            channel = client.get_channel(channel_id["sfpd_announcement"])
+            channel = client.get_channel(channel_id["sfpd_reminder_channel"])
             if(time[:2] == "10"):
                 if(today_date == str(first_and_third_sunday[0])[8:]):
-                    await channel.send('<@&990547306694713394>',embed = get_training_reminder_announcement_embed(f'{today_date}-{this_month}-{this_year}',"15:00"))
+                    await channel.send(f'<@&{sfpd_roles["verified"]}>',embed = get_training_reminder_announcement_embed(f'{today_date}-{this_month}-{this_year}',"15:00"))
                 elif(today_date == str(first_and_third_sunday[2])[8:]):
-                    await channel.send('<@&990547306694713394>',embed = get_training_reminder_announcement_embed(f'{today_date}-{this_month}-{this_year}',"20:00"))
+                    await channel.send(f'<@&{sfpd_roles["verified"]}>',embed = get_training_reminder_announcement_embed(f'{today_date}-{this_month}-{this_year}',"20:00"))
                 else:
                     print("Not a first or third sunday")

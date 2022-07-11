@@ -1,4 +1,4 @@
-async def factions(data,discord,ctx):
+async def factions(data,discord,ctx,total_execution_time):
         faction_embed = discord.Embed(
             title="[🎯] Factions info",
             description="_These are the current status of all the Factions_",
@@ -33,7 +33,7 @@ async def factions(data,discord,ctx):
         faction_embed.add_field(name="   Faction Name   ",value="{}".format(faction_details_with_escape_seq_converter("department_factions",data,"name")) ,inline=True)
         faction_embed.add_field(name="   Members   ",value="{}".format(faction_details_with_escape_seq_converter("department_factions",data,"members")) ,inline=True)
         faction_embed.add_field(name="   Status   ",value="{}".format(faction_details_with_escape_seq_converter("department_factions",data,"status")) ,inline=True)
-        faction_embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        faction_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more |use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
         
         
         

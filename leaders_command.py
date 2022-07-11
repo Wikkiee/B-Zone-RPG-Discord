@@ -1,4 +1,4 @@
-async def leaders(data,discord,ctx):
+async def leaders(data,discord,ctx,total_execution_time):
         leaders_embed = discord.Embed(
             title="[👑] Leaders info",
             description="_These are the current status of all the Leaders",
@@ -30,5 +30,5 @@ async def leaders(data,discord,ctx):
         leaders_embed.add_field(name="   Leader Name   ",value="{}".format(leaders_details_with_escape_seq_converter("department_factions",data,"name")) ,inline=True)
         leaders_embed.add_field(name="   Faction   ",value="{}".format(leaders_details_with_escape_seq_converter("department_factions",data,"faction")) ,inline=True)
         leaders_embed.add_field(name="   Last Login   ",value="{}".format(leaders_details_with_escape_seq_converter("department_factions",data,"last_login")) ,inline=True)
-        leaders_embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        leaders_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more |use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
         await ctx.reply(embed = leaders_embed)

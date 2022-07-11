@@ -39,7 +39,7 @@ async def playerinfo_func(discord,ctx,data,total_execution_time):
             player_info_embed.add_field(name="Forum Profile",value=f'[Click to PM]({data["forum_profile_link"]})',inline=True) 
         else:
             player_info_embed.add_field(name="Forum Profile",value="Not added",inline=True) 
-        player_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        player_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
 
         faction_info_embed.set_author(name=ctx.author.display_name,icon_url=ctx.author.display_avatar)
         faction_info_embed.add_field(name="Faction Name",value="**`{}`**".format(data["faction_name"]),inline=True)
@@ -52,7 +52,7 @@ async def playerinfo_func(discord,ctx,data,total_execution_time):
         # faction_info_embed.add_field(name="Recent Faction Logs",value="**Date \t Leader \t Faction \t Action\n{} \t {} \t {} \t {}\n**".format(data["faction_log"][0][1],data["faction_log"][1][1],data["faction_log"][2][1],data["faction_log"][3][1]),inline=False)
         
         
-        faction_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        faction_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
 
 
 
@@ -85,7 +85,7 @@ async def playerinfo_func(discord,ctx,data,total_execution_time):
         color=discord.Colour.random()
     )
         view = None
-        player_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/f432105e485288211f56b42f6e5e1d16.png?size=1024")
+        player_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
     await ctx.reply(embed=player_info_embed,view = view)
 
 

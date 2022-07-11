@@ -1,7 +1,10 @@
 
+import asyncio
 import os
 import aiohttp
+import time
 async def imgur_hanlder(image_url_list):
+    start_time = time.time()
     print("[Imgur Task] : Task started")
     API_ENDPOINT = "https://api.imgur.com/3"
     headers = {
@@ -22,39 +25,44 @@ async def imgur_hanlder(image_url_list):
             uploaded_images_id = []
             uploaded_images_deletehash_id = []
             uploaded_images_link = []
+            async def upload_mulitple(image_post_data):
+                async with session.post(url= f'{API_ENDPOINT}/upload',data=image_post_data,headers=headers) as resp:
+                        res = await resp.json()
+                        uploaded_images_link.append(res["data"]["link"])
+                        uploaded_images_id.append(res["data"]["id"])
+                        uploaded_images_deletehash_id.append(res["data"]["deletehash"])
+            tasks = []
             for image in image_url_list:
                 image_post_data = {
                     "image":image.url,
                     "type":"url",
                 }
-                async with aiohttp.ClientSession() as session:
-                    async with session.post(url= f'{API_ENDPOINT}/upload',data=image_post_data,headers=headers) as resp:
-                        res = await resp.json()
-                        uploaded_images_link.append(res["data"]["link"])
-                        uploaded_images_id.append(res["data"]["id"])
-                        uploaded_images_deletehash_id.append(res["data"]["deletehash"])
+                task = asyncio.create_task(upload_mulitple(image_post_data))
+                tasks.append(task)
+            
+            await asyncio.gather(*tasks)
 
-                        #https://api.imgur.com/3/
-                        album_image_add_data = {
-                            "deletehashes[]":uploaded_images_deletehash_id
-                        }
-                        async with aiohttp.ClientSession() as session:
-                            async with session.post(url= f'{API_ENDPOINT}/album/{album_delete_hash_id}/add',data=album_image_add_data,headers=headers) as resp:
-                                res = await resp.json()
+            #https://api.imgur.com/3/
+            album_image_add_data = {
+                "deletehashes[]":uploaded_images_deletehash_id
+                }
+            async with session.post(url= f'{API_ENDPOINT}/album/{album_delete_hash_id}/add',data=album_image_add_data,headers=headers) as resp:
+                    res = await resp.json()
                                 
-                                #https://api.imgur.com/3/album/{{albumHash}}
-                                async with aiohttp.ClientSession() as session:
-                                    async with session.get(url= f'{API_ENDPOINT}/album/{album_id}',headers=headers) as resp:
-                                        res = await resp.json()
-                                        print("\n Album links \n")
-                                        album_link = {
-                                            "first_image_link":uploaded_images_link[0],
-                                            "album_post_link":res["data"]["link"]
-                                            }
+            #https://api.imgur.com/3/album/{{albumHash}}
+            async with session.get(url= f'{API_ENDPOINT}/album/{album_id}',headers=headers) as resp:
+                    res = await resp.json()
+                    print("[Imgur Task] : Task completed ... Sending the link")
+                    end_time = time.time()
+                    total_time = "Result in : {} seconds".format(int(end_time - start_time)) 
+                    print(total_time)
+                    album_link = {
+                        "first_image_link":uploaded_images_link[0],
+                        "album_post_link":res["data"]["link"],
+                        "time_taken":total_time
+                    }
 
-                                        print("[Imgur Task] : Task completed ... Sending the link")
-                                        return album_link
-
+                    return album_link
 
 
 
