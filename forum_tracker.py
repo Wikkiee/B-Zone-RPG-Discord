@@ -9,7 +9,7 @@ async def tracker(client,discord):
     print(f'Forum Tracker Task : Collection creation result - {create_last_announcement_link()}')
     while True:
         last_link = get_last_announcement_link()
-        delay = 30
+        delay = 60
         print(f"[Forum Tracker Task]: Stopped for {delay}")
         await asyncio.sleep(delay)
         print("[Forum Tracker Task]:Looping again..")
