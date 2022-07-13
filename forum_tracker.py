@@ -9,7 +9,7 @@ async def tracker(client,discord):
     print(f'Forum Tracker Task : Collection creation result - {create_last_announcement_link()}')
     while True:
         last_link = get_last_announcement_link()
-        delay = 60
+        delay = 10
         print(f"[Forum Tracker Task]: Stopped for {delay}")
         await asyncio.sleep(delay)
         print("[Forum Tracker Task]:Looping again..")
@@ -31,6 +31,6 @@ async def tracker(client,discord):
                                         elif(forum_post_data["announce"] == 1):
                                             update_last_announcement_link(forum_post_data["post_link"])
                                             # last_link = forum_post_data["post_link"]
-                                            await channel.send(f'<@&{sfpd_roles["verified"]}>',embed = forum_tracker_post_embed(forum_post_data))
-                                else:
+                                            await channel.send(embed = forum_tracker_post_embed(forum_post_data))
+                                else: #f'<@&{sfpd_roles["verified"]}>',
                                     print("[Forum Tracker Task]: No new data ... back to loog")
