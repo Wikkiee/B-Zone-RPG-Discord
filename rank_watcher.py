@@ -82,40 +82,20 @@ async def watcher(client,discord,asyncio):
                                                 print("[Rank Watcher Task]: No changes in the rank")
 
                                     elif(is_valid_faction_member["other_faction"]==1):
-                                        if(player["faction_rank"] == "ex_member"):
-                                                        faction_rank_update_result = update_player_faction_rank(player["player_discord_id"],"ex_member")
-                                                        if(faction_rank_update_result):
-                                                                    await remove_role_function(member,guild)
-                                                                    role = member.guild.get_role(sfpd_roles["ex_member"])
-                                                                    await member.add_roles(role)
-                                                                    await member.send(embed = role_update_embed_generator(discord,player["player_name"],player["faction_name"],"Ex-Member"))
-                                                                    if(player["player_discord_id"] in [guild.owner_id,339956284205826048,374223751669088256,331861304425971712]):
-                                                                        print("[Rank Watcher Task]:Discord-server Admins")
-                                                                    else:
-                                                                        await member.edit(nick=player["player_name"])
-
-
-                                                        else:
-                                                            print("Something wrong with DB")  
-
-                                        elif(player["faction_rank"] in ["Officer (1)","Detective (2)","Sergeant (3)","Lieutenant (4)","Captain (5)","Captain (5)","Assistant Chief (6)","Chief (Leader)"]):
+                                        if(player["faction_rank"] in ["Officer (1)","Detective (2)","Sergeant (3)","Lieutenant (4)","Captain (5)","Assistant Chief (6)","Chief (Leader)"]):
                                                 faction_rank_update_result = update_player_faction_rank(player["player_discord_id"],"ex_member")
-                                                if(faction_rank_update_result):
-                                                            await remove_role_function(member,guild)
-                                                            role = member.guild.get_role(sfpd_roles["ex_member"])
-                                                            await member.add_roles(role)
-                                                            await member.send(embed = role_update_embed_generator(discord,player["player_name"],player["faction_name"],"Ex-Member"))
-                                                            if(player["player_discord_id"] in [guild.owner_id,339956284205826048,374223751669088256,331861304425971712]):
-                                                                print("[Rank Watcher Task]:Discord-server Admins")
-                                                            else:
-                                                                await member.edit(nick=player["player_name"])
+                                                await remove_role_function(member,guild)
+                                                role = member.guild.get_role(sfpd_roles["ex_member"])
+                                                await member.add_roles(role)
+                                                await member.send(embed = role_update_embed_generator(discord,player["player_name"],player["faction_name"],"Ex-Member"))
+                                                if(player["player_discord_id"] in [guild.owner_id,339956284205826048,374223751669088256,331861304425971712]):
+                                                    print("[Rank Watcher Task]:Discord-server Admins")
                                                 else:
-                                                    print("Something wrong with DB")
-                                                
-                                        
+                                                    await member.edit(nick=player["player_name"])                                    
 
 
                                     else:
+
                                         print("[Rank Watcher Task]: No changes..")
                 
                             elif(len(doc.select("#contentPage > div")[0]) == 1):   
