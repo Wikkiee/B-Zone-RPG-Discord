@@ -9,7 +9,7 @@ async def watcher(client,discord,asyncio):
     print("[Rank Watcher Task]: Started\n")
 
     while True:
-        delay = 5
+        delay = 30
         print(f"[Rank Watcher Task]: Stopped for {delay}")
         await asyncio.sleep(delay)
         print("[Rank Watcher Task]:Looping again...")
