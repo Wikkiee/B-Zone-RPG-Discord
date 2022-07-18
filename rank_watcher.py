@@ -9,13 +9,14 @@ async def watcher(client,discord,asyncio):
     print("[Rank Watcher Task]: Started\n")
 
     while True:
-        delay = 30
+        delay = 5
         print(f"[Rank Watcher Task]: Stopped for {delay}")
         await asyncio.sleep(delay)
         print("[Rank Watcher Task]:Looping again...")
         players_list = get_players_data()
         if(len(players_list) >0):
             for player in players_list:
+                print(f'\n [Rank Watcher Task]: Checking {player["player_name"]}\'s stats \n')
                 await client.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name=f'{player["player_name"]} | {player["faction_name"]}\'s {player["faction_rank"]}'))
                 await asyncio.sleep(delay)
                 guild = client.get_guild(player["player_guild_id"])
@@ -81,7 +82,23 @@ async def watcher(client,discord,asyncio):
                                                 print("[Rank Watcher Task]: No changes in the rank")
 
                                     elif(is_valid_faction_member["other_faction"]==1):
-                                        if(player["faction_rank"] in ["Officer (1)","Detective (2)","Sergeant (3)","Lieutenant (4)","Captain (5)","Captain (5)","Assistant Chief (6)","Chief (Leader)"]):
+                                        if(player["faction_rank"] == "ex_member"):
+                                                        faction_rank_update_result = update_player_faction_rank(player["player_discord_id"],"ex_member")
+                                                        if(faction_rank_update_result):
+                                                                    await remove_role_function(member,guild)
+                                                                    role = member.guild.get_role(sfpd_roles["ex_member"])
+                                                                    await member.add_roles(role)
+                                                                    await member.send(embed = role_update_embed_generator(discord,player["player_name"],player["faction_name"],"Ex-Member"))
+                                                                    if(player["player_discord_id"] in [guild.owner_id,339956284205826048,374223751669088256,331861304425971712]):
+                                                                        print("[Rank Watcher Task]:Discord-server Admins")
+                                                                    else:
+                                                                        await member.edit(nick=player["player_name"])
+
+
+                                                        else:
+                                                            print("Something wrong with DB")  
+
+                                        elif(player["faction_rank"] in ["Officer (1)","Detective (2)","Sergeant (3)","Lieutenant (4)","Captain (5)","Captain (5)","Assistant Chief (6)","Chief (Leader)"]):
                                                 faction_rank_update_result = update_player_faction_rank(player["player_discord_id"],"ex_member")
                                                 if(faction_rank_update_result):
                                                             await remove_role_function(member,guild)
@@ -94,6 +111,9 @@ async def watcher(client,discord,asyncio):
                                                                 await member.edit(nick=player["player_name"])
                                                 else:
                                                     print("Something wrong with DB")
+                                                
+                                        
+
 
                                     else:
                                         print("[Rank Watcher Task]: No changes..")
