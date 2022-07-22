@@ -1,4 +1,5 @@
 
+from random import Random
 import traceback
 import aiohttp
 import asyncio
@@ -25,16 +26,16 @@ load_dotenv(find_dotenv())
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-client = commands.Bot(command_prefix="!",intents = intents)
+client = commands.Bot(command_prefix=">",intents = intents)
 client.remove_command("help")
 
 @client.event
 async def on_ready():
     print("Discord Bot has logged in as {0.user}".format(client))
-    client.loop.create_task(status_task(client,asyncio,discord))
-    client.loop.create_task(training_reminder(client))
-    client.loop.create_task(watcher(client,discord,asyncio))
-    client.loop.create_task(tracker(client,discord))
+    # client.loop.create_task(status_task(client,asyncio,discord))
+    # client.loop.create_task(training_reminder(client))
+    # client.loop.create_task(watcher(client,discord,asyncio))
+    # client.loop.create_task(tracker(client,discord))
 #------------------------------- Utility Commands-Ends ----------------------------------
 
 @client.event
@@ -596,6 +597,31 @@ async def forum(ctx):
 
 
 
+@client.command()
+async def fmotd(ctx,*,message):
+    if(ctx.author.id in [491251010656927746,339956284205826048,374223751669088256]):
+        embed = discord.Embed(
+            title = f'Fmotd announcement',
+            description=f"_{message}_",
+            color= discord.Colour.random()
+        )
+        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
+        channel = client.get_channel(channel_id["sfpd_announcement"])
+        await channel.send(f'<@&{sfpd_roles["verified"]}>',embed = embed)
+    else:
+        embed = discord.Embed(
+        title="[⛔] WARNING",
+        description="**You are not allowed to use this command**",
+        color=discord.Colour.random()
+        )
+        embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
+        warn_msg = await ctx.reply(embed = embed)
+        await asyncio.sleep(5)
+        await warn_msg.delete()
+
+
+
+
 #---------------------------- RPG Commands-Ends ----------------------------------
 
 #------------------------------- Help Commands-Starts ----------------------------------
@@ -611,21 +637,8 @@ async def help(ctx):
 
 #------------------------------- Experiment Commands-starts ----------------------------------
 
+
 #------------------------------- Experiment Commands-ends ----------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
