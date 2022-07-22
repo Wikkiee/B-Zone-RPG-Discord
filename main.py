@@ -32,10 +32,10 @@ client.remove_command("help")
 @client.event
 async def on_ready():
     print("Discord Bot has logged in as {0.user}".format(client))
-    # client.loop.create_task(status_task(client,asyncio,discord))
-    # client.loop.create_task(training_reminder(client))
-    # client.loop.create_task(watcher(client,discord,asyncio))
-    # client.loop.create_task(tracker(client,discord))
+    client.loop.create_task(status_task(client,asyncio,discord))
+    client.loop.create_task(training_reminder(client))
+    client.loop.create_task(watcher(client,discord,asyncio))
+    client.loop.create_task(tracker(client,discord))
 #------------------------------- Utility Commands-Ends ----------------------------------
 
 @client.event
