@@ -606,7 +606,7 @@ async def fmotd(ctx,*,message):
             color= discord.Colour.random()
         )
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-        channel = client.get_channel(channel_id["sfpd_announcement"])
+        channel = client.get_channel(channel_id["sfpd_fmotd_announcement_channel"])
         await channel.send(f'<@&{sfpd_roles["verified"]}>',embed = embed)
     else:
         embed = discord.Embed(

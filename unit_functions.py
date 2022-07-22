@@ -22,7 +22,8 @@ channel_id = {
     "sfpd_verification_channel":993900422081290342, #993900422081290342
     "sfpd_reminder_channel":993900617963679786, #993900617963679786
     "sfpd_suggestion_channel_id":993906948216995871, #993906948216995871
-    "sfpd_bot_log_channel" : 995969103162519572
+    "sfpd_bot_log_channel" : 995969103162519572,
+    "sfpd_fmotd_announcement_channel":999911554055147590
 }
 
 
