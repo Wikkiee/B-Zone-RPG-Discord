@@ -1,10 +1,12 @@
 
 from pymongo import MongoClient
 import re
+import os
 
 
-client = MongoClient('mongodb+srv://wikkie:vignesh7550@b-zone-discord-bot-db.gr1zx.mongodb.net/?retryWrites=true&w=majority')
+client = MongoClient(os.environ.get("DB_TOKEN"))
 db = client.rpg_users_discord_database
+
 users_collection = db.rpg_users_discord_collection
 
 
