@@ -74,6 +74,7 @@ async def verify(discord,ctx,data,player_name):
                     await ctx.reply(embed=embed)
             elif(data["other_faction"]==1):
                     member = ctx.message.author
+                    await remove_role_function(member,guild)
                     role = member.guild.get_role(sfpd_roles["other_faction_members"])
                     await member.add_roles(role)
                     await member.edit(nick=player_name)
