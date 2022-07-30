@@ -1,7 +1,10 @@
 
+import os
 from pymongo import MongoClient
 import re
-import os
+from dotenv import load_dotenv,find_dotenv
+load_dotenv(find_dotenv())
+
 
 
 client = MongoClient(os.environ.get("DB_TOKEN"))
