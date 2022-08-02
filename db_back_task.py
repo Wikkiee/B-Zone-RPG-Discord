@@ -4,6 +4,8 @@ import traceback
 from bson import json_util
 from database import get_players_data
 from datetime import datetime
+from unit_functions import guild_id,channel_id
+
 
 async def backup_task(client,discord):
     # guild = client.get_guild(guild_id["sfpd"])
@@ -33,8 +35,8 @@ async def backup_task(client,discord):
             async def create_json():
                 with open('outputfile.json', 'w+') as fout:
                     json.dump(data, fout)
-                    guild = client.get_guild(959138134413684836)
-                    log_channel = guild.get_channel(990242620687122462)
+                    guild = client.get_guild(guild["sfpd"])
+                    log_channel = guild.get_channel(channel_id["sfpd_data_backup_channel"])
                     wikkie_id = 491251010656927746
                     developer = guild.get_member(wikkie_id)
                     fout.close()
