@@ -7,10 +7,10 @@ from bs4 import BeautifulSoup
 
 async def watcher(client,discord,asyncio):
 
-    exception_log_guild = client.get_guild(guild_id["sfpd"])
-    log_channel = exception_log_guild.get_channel(channel_id["sfpd_bot_log_channel"])
+    log_guild = client.get_guild(guild_id["sfpd"])
+    log_channel = log_guild.get_channel(channel_id["sfpd_bot_log_channel"])
     wikkie_id = 491251010656927746
-    developer = exception_log_guild.get_member(wikkie_id)
+    developer = log_guild.get_member(wikkie_id)
     embed = discord.Embed(
     title="[🔨] SFPD Bot's Error Manager",
     description="An Error occured in the Task : [Rank_Watcher]",
