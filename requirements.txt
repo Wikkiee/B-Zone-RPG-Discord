@@ -7,5 +7,5 @@ pymongo[srv]
 beautifulsoup4==4.11.1
 requests==2.28.1
 psutil==5.9.1
-py-cpuinfo 8.0.0
+py-cpuinfo==8.0.0
 python-bsonjs==0.3.0
