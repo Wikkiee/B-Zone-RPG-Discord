@@ -1,13 +1,32 @@
 
-from random import Random
+#----------------------------------> Utility imports - Starts <--------------------------
+
+
 import traceback
 import aiohttp
 import asyncio
 import os
 import time
+import psutil
+import cpuinfo
+from bs4 import BeautifulSoup
+
+
+#----------------------------------> Utility imports - Ends <--------------------------
+
+#----------------------------------> Discord package imports - Starts <--------------------------
+
+
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv,find_dotenv
+
+
+#----------------------------------> Discord package imports - Ends <--------------------------
+
+#----------------------------------> Custom Module imports - Starts <--------------------------
+
+from db_back_task import backup_task 
 from database import is_registered_user,clean_database,update_player_faction_rank,is_registered_rpg_user
 from rank_verify import verify
 from status import status_task
@@ -18,8 +37,11 @@ from forum_tracker import tracker
 from unit_functions import role_update_embed_generator,imagur_upload_embed_generator,channel_id,global_url,guild_id
 from imgur_upload_handler import imgur_hanlder
 from reminder import training_reminder
-from bs4 import BeautifulSoup
 
+
+#----------------------------------> Custom Module imports - Ends <--------------------------
+
+#----------------------------------> Setups - Starts <--------------------------
 
 load_dotenv(find_dotenv())
 
@@ -29,17 +51,24 @@ intents.members = True
 client = commands.Bot(command_prefix="!",intents = intents)
 client.remove_command("help")
 
+#----------------------------------> Setups - Ends <--------------------------
+
+
 @client.event
 async def on_ready():
     print("Discord Bot has logged in as {0.user}".format(client))
-    client.loop.create_task(status_task(client,asyncio,discord))
-    client.loop.create_task(training_reminder(client))
-    client.loop.create_task(watcher(client,discord,asyncio))
-    client.loop.create_task(tracker(client,discord))
-#------------------------------- Utility Commands-Ends ----------------------------------
+    global cpu_info
+    cpu_info = cpuinfo.get_cpu_info()["brand_raw"]
+    client.loop.create_task(status_task(client,asyncio,discord),name="stats_task")
+    client.loop.create_task(training_reminder(client,discord),name="training_reminder")
+    client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
+    client.loop.create_task(tracker(client,discord),name="tracker")
+    client.loop.create_task(backup_task(client,discord),name="db_backup")
+#------------------------------- Utility Commands-Starts ----------------------------------
 
 @client.event
 async def on_message(message):
+    
     if(message.channel.id in [channel_id["sfpd_imgur"],959138134413684840,990562699056402462]):
         images = message.attachments
         if(len(images)>0):
@@ -618,6 +647,45 @@ async def fmotd(ctx,*,message):
         warn_msg = await ctx.reply(embed = embed)
         await asyncio.sleep(5)
         await warn_msg.delete()
+
+
+
+@client.command(aliases = ["ping","botinfo","botstats"])
+async def stats(ctx):
+    all_tasks = asyncio.all_tasks()
+    all_tasks_name_list = []
+    for i in all_tasks:
+        if(i.get_name() != "Task-1"):
+            all_tasks_name_list.append(i.get_name())
+    
+    embed = discord.Embed(title = '[🚀] SFPD Bot System resource', description = '_**See CPU & memory usage of the system, tasks and ping of the system**_',color=discord.Colour.random())
+    embed.add_field(name = 'CPU Model', value = f'{cpu_info}', inline = False)
+    embed.add_field(name = 'CPU Usage', value = f'{psutil.cpu_percent()}%', inline = False)
+    embed.add_field(name = 'Memory Usage', value = f'{psutil.virtual_memory().percent}%', inline = False)
+    embed.add_field(name = 'Tasks', value = f'>>> **Status ** --> {"`Running`" if ("stats_task" in all_tasks_name_list) else "`Stopped`"}\n**Rank Watcher** --> {"`Running`" if("watcher" in all_tasks_name_list) else "`Stopped`"}\n**Forum Tracker** --> {"`Running`" if("tracker" in all_tasks_name_list) else "`Stopped`"}\n**Training Reminder** --> {"`Running`" if("training_reminder" in all_tasks_name_list) else "`Stopped`"}\n**Database Backup** --> {"`Running`" if("db_backup" in all_tasks_name_list) else "`Stopped`"}', inline = False)
+    embed.add_field(name = 'Bot\'s PING', value = f'`{round(client.latency*1000,1)}` ms', inline = False)
+    embed.set_thumbnail(url=client.user.display_avatar)
+    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
+    embed.set_image(url="https://cdn.discordapp.com/attachments/961691415400820776/993049804793974914/ezgif.com-gif-maker_4.gif")
+    await ctx.send(embed = embed)
+
+
+
+@client.command(aliases =["update"])
+async def updates(ctx):
+    embed = discord.Embed(
+        title="[🧶] SFPD Bot's Patch Notes",
+        description="The Updates and bug fixes are listed below !",
+        color=discord.Colour.random()
+    )
+    embed.add_field(name="What's new !",value=f">>>  🔸 _**Added new command to know about bot's system info**_ --> [`!botstats`]\n🔸 _**Added new tasks to keep track on forum topic posts**_\n🔸 _**Added new command to view players profile** _--> [`!pfp @mention_player`]\n🔸 **Added new task to remind weekly trainings**\n🔸 **Added new data backup system to backup the data**",inline = False)
+    embed.add_field(name="Minor updates !",value=">>> 🔸 **_Bot response time was improved greatly_**\n🔸 **_Optimized major functions_**\n🔸 **_Fixed major bugs_**",inline = False)
+    embed.set_thumbnail(url=client.user.display_avatar)
+    embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
+    embed.set_image(url="https://cdn.discordapp.com/attachments/961691415400820776/993049804793974914/ezgif.com-gif-maker_4.gif")
+    await ctx.send(embed = embed)
+
+
 
 
 
