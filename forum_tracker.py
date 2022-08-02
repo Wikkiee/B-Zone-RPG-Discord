@@ -8,12 +8,12 @@ from unit_functions import guild_id,channel_id,global_url,sfpd_roles,forum_track
 
 
 async def tracker(client,discord):
-    guild = client.get_guild(guild_id["sfpd"])
-    log_channel = guild.get_channel(channel_id["sfpd_bot_log_channel"])
+     = client.get_guild(guild_id["sfpd"])
+    log_channexception_log_guildel = exception_log_guild.get_channel(channel_id["sfpd_bot_log_channel"])
     # guild = client.get_guild(959138134413684836)
     # log_channel = guild.get_channel(990242620687122462)
     wikkie_id = 491251010656927746
-    developer = guild.get_member(wikkie_id)
+    developer = exception_log_guild.get_member(wikkie_id)
     embed = discord.Embed(
     title="[🔨] SFPD Bot's Error Manager",
     description="An Error occured in the Task : [Forum_Tracker]",
