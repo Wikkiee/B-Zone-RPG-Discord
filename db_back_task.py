@@ -22,7 +22,7 @@ async def backup_task(client,discord):
     print("[Data-Backup Task] : Started\n")    
     try:
         while True:
-            delay = 60
+            delay = 86400
             print(f"[Data-Backup Task] : Delayed for {delay}\n")
             await asyncio.sleep(delay)
             print("[Data-Backup Task] : Getting data from DB\n")
