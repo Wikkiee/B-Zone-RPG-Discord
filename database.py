@@ -45,7 +45,7 @@ def get_players_data():
     return result
 
 def is_registered_user(user_id):
-    result = users_collection.find_one({"player_discord_id":user_id})
+    result = users_collection.find_one({"player_discord_id":str(user_id)})
     return result
 
 def is_registered_rpg_user(player_name):
@@ -70,8 +70,8 @@ def update_player_other_faction(user_id,other_faction_value):
     return len(result)
 
 
-def clean_database():
-    users_collection.delete_many({})
-    print("Cleaned the collections")
-    result = list(users_collection.find())
-    return result
+# def clean_database():
+#     users_collection.delete_many({})
+#     print("Cleaned the collections")
+#     result = list(users_collection.find())
+#     return result
