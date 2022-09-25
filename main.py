@@ -60,7 +60,7 @@ async def on_ready():
     global cpu_info
     cpu_info = cpuinfo.get_cpu_info()["brand_raw"]
     # client.loop.create_task(status_task(client,asyncio,discord),name="stats_task")
-    #client.loop.create_task(training_reminder(client,discord),name="training_reminder")
+    client.loop.create_task(training_reminder(client,discord),name="training_reminder")
     client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
     client.loop.create_task(tracker(client,discord),name="tracker")
     client.loop.create_task(backup_task(client,discord),name="db_backup")
@@ -663,7 +663,7 @@ async def stats(ctx):
     embed.add_field(name = 'CPU Model', value = f'{cpu_info}', inline = False)
     embed.add_field(name = 'CPU Usage', value = f'{psutil.cpu_percent()}%', inline = False)
     embed.add_field(name = 'Memory Usage', value = f'{psutil.virtual_memory().percent}%', inline = False)
-    embed.add_field(name = 'Tasks', value = f'>>> **Rank Watcher** --> {"`Running`" if("watcher" in all_tasks_name_list) else "`Stopped`"}\n**Forum Tracker** --> {"`Running`" if("tracker" in all_tasks_name_list) else "`Stopped`"}\n**Training Reminder** --> {"`Running`" if("training_reminder" in all_tasks_name_list) else "`Disabled`"}\n**Database Backup** --> {"`Running`" if("db_backup" in all_tasks_name_list) else "`Stopped`"}', inline = False)
+    embed.add_field(name = 'Tasks', value = f'>>> **Rank Watcher** --> {"`Running`" if("watcher" in all_tasks_name_list) else "`Stopped`"}\n**Forum Tracker** --> {"`Running`" if("tracker" in all_tasks_name_list) else "`Stopped`"}\n**Training Reminder** --> {"`Running`" if("training_reminder" in all_tasks_name_list) else "`Stopped`"}\n**Database Backup** --> {"`Running`" if("db_backup" in all_tasks_name_list) else "`Stopped`"}', inline = False)
     embed.add_field(name = 'Bot\'s PING', value = f'`{round(client.latency*1000,1)}` ms', inline = False)
     embed.set_thumbnail(url=client.user.display_avatar)
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
