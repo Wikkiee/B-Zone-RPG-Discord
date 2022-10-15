@@ -37,6 +37,7 @@ from forum_tracker import tracker
 from unit_functions import role_update_embed_generator,imagur_upload_embed_generator,channel_id,global_url,guild_id
 from imgur_upload_handler import imgur_hanlder
 from reminder import training_reminder
+from task_master import task_master
 from add_market_command_handler import add_market_function
 
 #----------------------------------> Custom Module imports - Ends <--------------------------
@@ -48,7 +49,7 @@ load_dotenv(find_dotenv())
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-client = commands.Bot(command_prefix="!",intents = intents)
+client = commands.Bot(command_prefix=".",intents = intents)
 client.remove_command("help")
 
 #----------------------------------> Setups - Ends <--------------------------
@@ -62,6 +63,7 @@ async def on_ready():
     # client.loop.create_task(status_task(client,asyncio,discord),name="stats_task")
     client.loop.create_task(training_reminder(client,discord),name="training_reminder")
     client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
+    client.loop.create_task(task_master(client,discord,asyncio),name="task_master")
     client.loop.create_task(tracker(client,discord),name="tracker")
     client.loop.create_task(backup_task(client,discord),name="db_backup")
 #------------------------------- Utility Commands-Starts ----------------------------------
@@ -663,7 +665,7 @@ async def stats(ctx):
     embed.add_field(name = 'CPU Model', value = f'{cpu_info}', inline = False)
     embed.add_field(name = 'CPU Usage', value = f'{psutil.cpu_percent()}%', inline = False)
     embed.add_field(name = 'Memory Usage', value = f'{psutil.virtual_memory().percent}%', inline = False)
-    embed.add_field(name = 'Tasks', value = f'>>> **Rank Watcher** --> {"`Running`" if("watcher" in all_tasks_name_list) else "`Stopped`"}\n**Forum Tracker** --> {"`Running`" if("tracker" in all_tasks_name_list) else "`Stopped`"}\n**Training Reminder** --> {"`Running`" if("training_reminder" in all_tasks_name_list) else "`Stopped`"}\n**Database Backup** --> {"`Running`" if("db_backup" in all_tasks_name_list) else "`Stopped`"}', inline = False)
+    embed.add_field(name = 'Tasks', value = f'>>> **Rank Watcher** --> {"`Running`" if("watcher" in all_tasks_name_list) else "`Stopped`"}\n**Forum Tracker** --> {"`Running`" if("tracker" in all_tasks_name_list) else "`Stopped`"}\n**Training Reminder** --> {"`Running`" if("training_reminder" in all_tasks_name_list) else "`Stopped`"}\n**Database Backup** --> {"`Running`" if("db_backup" in all_tasks_name_list) else "`Stopped`"}\n**Task Master** --> {"`Running`" if("task_master" in all_tasks_name_list) else "`Stopped`"}', inline = False)
     embed.add_field(name = 'Bot\'s PING', value = f'`{round(client.latency*1000,1)}` ms', inline = False)
     embed.set_thumbnail(url=client.user.display_avatar)
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
@@ -705,6 +707,20 @@ async def help(ctx):
 
 
 #------------------------------- Experiment Commands-starts ----------------------------------
+
+# @client.command(aliases = ["t"])
+# async def test(ctx):
+#     all_tasks = asyncio.all_tasks()
+#     all_tasks_name_list = []
+#     for i in all_tasks:
+#         if(i.get_name() != "Task-1"):
+#             all_tasks_name_list.append(i.get_name())
+
+#     await ctx.send(all_tasks_name_list)
+
+# @client.command(aliases = ["ts"])
+# async def tests(ctx):
+#     client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
 
 # @client.command(aliases = ["ad"])
 # async def test(ctx):

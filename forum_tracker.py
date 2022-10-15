@@ -83,6 +83,8 @@ async def tracker(client,discord):
                                             elif("Transfer Echipe / Team Transfer" in topic_name):
                                                 if("dabro.pdf" in post_author):
                                                     other_data = 1
+                                                elif("South Zeom" in post_author):
+                                                    other_data = 1
                                                 else:
                                                     forum_topic_name = "Transfer Echipe / Team Transfer"
                                                     dm = 1
@@ -120,7 +122,10 @@ async def tracker(client,discord):
                                                 if(forum_post_data["dm_dabro"] == 1):
                                                     update_last_announcement_link(forum_post_data["post_link"])
                                                     dabro = client.get_user(339956284205826048)
+                                                    zeom = client.get_user(342754704054550531)
                                                     await dabro.send(embed = forum_tracker_post_embed(forum_post_data))
+                                                    if(forum_post_data["forum_topic"] == "Transfer Echipe / Team Transfer"):
+                                                        await zeom.send(embed = forum_tracker_post_embed(forum_post_data))
                                                 elif(forum_post_data["announce"] == 1):
                                                     update_last_announcement_link(forum_post_data["post_link"])
                                                     # last_link = forum_post_data["post_link"]
