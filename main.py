@@ -49,7 +49,7 @@ load_dotenv(find_dotenv())
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-client = commands.Bot(command_prefix=".",intents = intents)
+client = commands.Bot(command_prefix="!",intents = intents)
 client.remove_command("help")
 
 #----------------------------------> Setups - Ends <--------------------------
