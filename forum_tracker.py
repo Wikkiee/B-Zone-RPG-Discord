@@ -122,7 +122,7 @@ async def tracker(client,discord):
                                                 if(forum_post_data["dm_dabro"] == 1):
                                                     update_last_announcement_link(forum_post_data["post_link"])
                                                     dabro = client.get_user(339956284205826048)
-                                                    zeom = client.get_user(342754704054550531)
+                                                    zeom = client.get_user(491251010656927746)
                                                     await dabro.send(embed = forum_tracker_post_embed(forum_post_data))
                                                     if(forum_post_data["forum_topic"] == "Transfer Echipe / Team Transfer"):
                                                         await zeom.send(embed = forum_tracker_post_embed(forum_post_data))
