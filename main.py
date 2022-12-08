@@ -8,6 +8,7 @@ import asyncio
 import os
 import time
 import cpuinfo
+import psutil
 from bs4 import BeautifulSoup
 
 
