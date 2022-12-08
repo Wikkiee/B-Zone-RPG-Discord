@@ -60,11 +60,11 @@ async def on_ready():
     global cpu_info
     cpu_info = cpuinfo.get_cpu_info()["brand_raw"]
     # client.loop.create_task(status_task(client,asyncio,discord),name="stats_task")
-    # client.loop.create_task(training_reminder(client,discord),name="training_reminder")
-    # client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
-    # client.loop.create_task(task_master(client,discord,asyncio),name="task_master")
-    # client.loop.create_task(tracker(client,discord),name="tracker")
-    # client.loop.create_task(backup_task(client,discord),name="db_backup")
+    client.loop.create_task(training_reminder(client,discord),name="training_reminder")
+    client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
+    client.loop.create_task(task_master(client,discord,asyncio),name="task_master")
+    client.loop.create_task(tracker(client,discord),name="tracker")
+    client.loop.create_task(backup_task(client,discord),name="db_backup")
 #------------------------------- Utility Commands-Starts ----------------------------------
 
 @client.event
