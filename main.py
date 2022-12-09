@@ -19,6 +19,7 @@ from bs4 import BeautifulSoup
 
 import discord
 from discord.ext import commands
+from discord.commands import Option
 from dotenv import load_dotenv,find_dotenv
 
 
@@ -49,7 +50,7 @@ load_dotenv(find_dotenv())
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-client = commands.Bot(command_prefix="!",intents = intents)
+client = commands.Bot(command_prefix="#",intents = intents)
 client.remove_command("help")
 
 #----------------------------------> Setups - Ends <--------------------------
@@ -214,9 +215,9 @@ async def on_command_error(ctx,error = ""):
     else:
         raise error
 
-
-@client.command()
-async def pfp(ctx,user:discord.Member):
+@client.slash_command(description='To view the PFP')
+# @client.command()
+async def pfp(ctx,user:Option(discord.Member, "@mention", required = True)):
     link = str(user.display_avatar)
     embed = discord.Embed(
         title="Download the picture",
@@ -225,7 +226,7 @@ async def pfp(ctx,user:discord.Member):
     )
     embed.set_image(url=link)
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-    await ctx.reply(embed = embed)
+    await ctx.respond(embed = embed)
 
 
 
@@ -236,10 +237,10 @@ async def pfp(ctx,user:discord.Member):
 
 #------------------------------- RPG Commands-Starts ----------------------------------
 
-
-@client.command(aliases = ["pi","id"])
+@client.slash_command(description='To view the players RPG Account stats')
+# @client.command(aliases = ["pi","id"])
 @commands.cooldown(1, 5, commands.BucketType.guild)
-async def playerinfo(ctx,player_name):
+async def playerinfo(ctx,player_name: Option(str, "Enter your RPG Account name", required = True)):
     start_time = time.time()
     try:
         embed = discord.Embed(
@@ -247,7 +248,7 @@ async def playerinfo(ctx,player_name):
             color=discord.Colour.random()
         )
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-        await ctx.reply(embed = embed)
+        await ctx.respond(embed = embed)
         data={}
         async with aiohttp.ClientSession() as session:
             async with session.get(f'https://www.rpg.b-zone.ro/players/general/{player_name}') as resp:
@@ -316,22 +317,22 @@ async def playerinfo(ctx,player_name):
         )
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
         
-        await ctx.reply(embed = embed)
+        await ctx.respond(embed = embed)
 
 
 
 
 
 
-@client.command()
-@commands.cooldown(1, 5, commands.BucketType.guild)
+# @client.command()
+# @commands.cooldown(1, 5, commands.BucketType.guild)
 async def factions(ctx):
     embed = discord.Embed(
         description="**Fetching the factions details** \n Please wait for a while",
         color=discord.Colour.random()
     )
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-    await ctx.reply(embed = embed)
+    await ctx.respond(embed = embed)
     try:
         start_time = time.time()
         data = {}
@@ -391,8 +392,8 @@ async def factions(ctx):
 
 
 
-@client.command()
-@commands.cooldown(1, 5, commands.BucketType.guild)
+# @client.command()
+# @commands.cooldown(1, 5, commands.BucketType.guild)
 async def leaders(ctx):
     embed = discord.Embed(
         description="**Fetching the leaders details** \n Please wait for a while",
@@ -447,8 +448,8 @@ async def leaders(ctx):
         await ctx.reply(embed = embed)
 
 
-@client.command(aliases = ["admins"])
-@commands.cooldown(1, 5, commands.BucketType.guild)
+# @client.command(aliases = ["admins"])
+# @commands.cooldown(1, 5, commands.BucketType.guild)
 async def helpers(ctx):
     embed = discord.Embed(
         description="**Fetching Staffs details** \n Please wait for a while",
@@ -502,16 +503,15 @@ async def helpers(ctx):
         color=discord.Colour.random()
         )
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-        await ctx.reply(embed = embed)
+        await ctx.respond(embed = embed)
 
 
-
-@client.command(aliases = ["sv"])
+@client.slash_command(description='To verify your RPG Account')
 @commands.cooldown(1, 5, commands.BucketType.guild)
-async def sverify(ctx,player_name):
+async def verify(ctx,player_name: Option(str, "Enter your RPG-1 Account name", required = True)):
     channels_id = [channel_id["sfpd_verification_channel"]] 
     if(ctx.channel.id in channels_id):
-        is_already_registered_user = is_registered_user(ctx.message.author.id)
+        is_already_registered_user = is_registered_user(ctx.author.id)
         if(bool(is_already_registered_user) and is_already_registered_user["player_discord_id"] == ctx.message.author.id):
             embed = discord.Embed(
                 title="[⛔] Something went wrong",
@@ -519,7 +519,7 @@ async def sverify(ctx,player_name):
                 color=discord.Colour.random()
             )
             embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-            await ctx.reply(embed = embed)
+            await ctx.respond(embed = embed)
         else:
             is_already_registered_rpg_username = is_registered_rpg_user(player_name)
             print(is_already_registered_rpg_username)
@@ -530,7 +530,7 @@ async def sverify(ctx,player_name):
                     color=discord.Colour.random()
                 )
                 embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-                await ctx.reply(embed = embed)
+                await ctx.respond(embed = embed)
             else:
                 if(ctx.channel.id in channels_id):
                     try:
@@ -539,7 +539,7 @@ async def sverify(ctx,player_name):
                             color=discord.Colour.random()
                         )
                         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-                        await ctx.reply(embed = embed)
+                        await ctx.respond(embed = embed)
                         data={}
                         async with aiohttp.ClientSession() as session:
                             async with session.get(f'https://www.rpg.b-zone.ro/players/faction/{player_name}') as resp:
@@ -569,7 +569,7 @@ async def sverify(ctx,player_name):
                                     color=discord.Colour.random()
                                     )
                                     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-                                    await ctx.reply(embed = embed)
+                                    await ctx.respond(embed = embed)
                     except :
                         embed = discord.Embed(
                         title="**Error occured**",
@@ -577,7 +577,7 @@ async def sverify(ctx,player_name):
                         color=discord.Colour.random()
                         )
                         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-                        await ctx.reply(embed = embed)
+                        await ctx.respond(embed = embed)
     else:
         embed = discord.Embed(
         title="[⛔] WARNING",
@@ -585,14 +585,14 @@ async def sverify(ctx,player_name):
         color=discord.Colour.random()
         )
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-        await ctx.reply(embed = embed)
+        await ctx.respond(embed = embed)
 
 
 
 
-@client.command()
+@client.slash_command(description='To send a suggestion to the developer')
 @commands.cooldown(1, 600, commands.BucketType.guild)
-async def suggestions(ctx,*,message):
+async def suggestions(ctx,*,message: Option(str, "Write your suggestions", required = True)):
     channel = client.get_channel(channel_id["sfpd_suggestion_channel_id"])
     embed = discord.Embed(
         title=f'Suggestion from {ctx.author} | [server : {ctx.guild}]',
@@ -608,15 +608,13 @@ async def suggestions(ctx,*,message):
         color=discord.Colour.random()
     )
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-    reply_message = await ctx.reply(embed = embed)
-    await asyncio.sleep(4)
-    await ctx.message.delete()
-    await reply_message.delete()
+    await ctx.respond(embed = embed,delete_after=4)
 
 
 
 
-@client.command()
+
+@client.slash_command(description='To get the list of SFPD Forum section links')
 async def forum(ctx):
     embed = discord.Embed(
         title="[📕] SF Police Department Forum",
@@ -625,11 +623,11 @@ async def forum(ctx):
     )
     embed.add_field(name="Topics",value=">>> [[ 📣 ] Important Announcements](https://forum.b-zone.ro/topic/123508-sf-police-department-%F0%9F%93%A3-anun%C5%A3uri-importante-important-announcements-%F0%9F%93%A3/)\n[[ 🎯 ] Challenge of the week](https://forum.b-zone.ro/topic/356270-sf-police-departament-misiunea-s%C4%83pt%C4%83m%C3%A2nii-challenge-of-the-week/)\n[[ 📌 ] Internal Rules ](https://forum.b-zone.ro/topic/422237-sf-police-department-%F0%9F%93%8C-regulament-intern-internal-rules-%F0%9F%93%8C/)\n[[ 🔖 ]Wanted, Arrest and Ticket List](https://forum.b-zone.ro/topic/122599-sf-police-department-wanted-arrest-and-ticket-list/)\n[[ 🎫 ] Training Pass Requests ](https://forum.b-zone.ro/topic/384352-sf-police-department-%F0%9F%9F%A2-%C3%AEnvoiri-pass-requests-%F0%9F%9F%A2/)\n[[ 👮‍♂️ ] Officers of the week ](https://forum.b-zone.ro/topic/430679-sf-police-department-ofi%C8%9Berii-s%C4%83pt%C4%83m%C3%A2nii-officers-of-the-week/)\n")
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-    await ctx.reply(embed=embed)
+    await ctx.respond(embed=embed)
 
 
 
-@client.command()
+@client.slash_command(description='To send fmotd message')
 async def fmotd(ctx,*,message):
     if(ctx.author.id in [491251010656927746,339956284205826048,374223751669088256]):
         embed = discord.Embed(
@@ -647,13 +645,13 @@ async def fmotd(ctx,*,message):
         color=discord.Colour.random()
         )
         embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-        warn_msg = await ctx.reply(embed = embed)
+        warn_msg = await ctx.respond(embed = embed)
         await asyncio.sleep(5)
         await warn_msg.delete()
 
 
 
-@client.command(aliases = ["ping","botinfo","botstats"])
+@client.slash_command(description='To see about bot resource usage')
 async def stats(ctx):
     all_tasks = asyncio.all_tasks()
     all_tasks_name_list = []
@@ -670,11 +668,11 @@ async def stats(ctx):
     embed.set_thumbnail(url=client.user.display_avatar)
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
     embed.set_image(url="https://cdn.discordapp.com/attachments/961691415400820776/993049804793974914/ezgif.com-gif-maker_4.gif")
-    await ctx.send(embed = embed)
+    await ctx.respond(embed = embed)
 
 
 
-@client.command(aliases =["update"])
+@client.slash_command(description="To see the list of new updates")
 async def updates(ctx):
     embed = discord.Embed(
         title="[🧶] SFPD Bot's Patch Notes",
@@ -686,7 +684,7 @@ async def updates(ctx):
     embed.set_thumbnail(url=client.user.display_avatar)
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
     embed.set_image(url="https://cdn.discordapp.com/attachments/961691415400820776/993049804793974914/ezgif.com-gif-maker_4.gif")
-    await ctx.send(embed = embed)
+    await ctx.respond(embed = embed)
 
 
 
@@ -698,9 +696,10 @@ async def updates(ctx):
 #------------------------------- Help Commands-Starts ----------------------------------
 
 
-@client.command(aliases = ["h"])
+@client.slash_command(description="To see the list of help commands")
 async def help(ctx):
     await help_command.help(discord,client,ctx)
+    
  
 
 #------------------------------- Help Commands-Ends ----------------------------------
@@ -708,24 +707,9 @@ async def help(ctx):
 
 #------------------------------- Experiment Commands-starts ----------------------------------
 
-# @client.command(aliases = ["t"])
-# async def test(ctx):
-#     all_tasks = asyncio.all_tasks()
-#     all_tasks_name_list = []
-#     for i in all_tasks:
-#         if(i.get_name() != "Task-1"):
-#             all_tasks_name_list.append(i.get_name())
-
-#     await ctx.send(all_tasks_name_list)
-
-# @client.command(aliases = ["ts"])
-# async def tests(ctx):
-#     client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
-
-# @client.command(aliases = ["ad"])
-# async def test(ctx):
-#     await add_market_function(ctx,discord)
-
+@client.slash_command(description="Sends the bot's latency.") # this decorator makes a slash command
+async def ping(ctx): # a slash command will be created with the name "ping"
+    await ctx.respond(f"Pong! Latency is {client.latency}")
 
 #------------------------------- Experiment Commands-ends ----------------------------------
 

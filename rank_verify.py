@@ -85,9 +85,9 @@ async def verify(discord,ctx,data,player_name):
                         color = discord.Color.random(),
                     )
                     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-                    await ctx.reply(embed=embed)
+                    await ctx.respond(embed=embed)
         else:
-            print("Error_1")
+            print("Error")
 
     
     except Exception as e:

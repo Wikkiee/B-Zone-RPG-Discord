@@ -45,5 +45,5 @@ async def factions(data,discord,ctx,total_execution_time):
 
 
 
-        await ctx.reply(embed = faction_embed)
+        await ctx.respond(embed = faction_embed)
 

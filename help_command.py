@@ -18,4 +18,4 @@ async def help(discord,client,ctx):
     embed.set_image(url="https://cdn.discordapp.com/attachments/961691415400820776/993049804793974914/ezgif.com-gif-maker_4.gif")
     embed.set_thumbnail(url=client.user.display_avatar)
     embed.set_footer(text="use `!help` to know more |use !suggestions to share your ideas",icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-    await ctx.send(embed=embed)
+    await ctx.respond(embed=embed)

@@ -86,7 +86,7 @@ async def playerinfo_func(discord,ctx,data,total_execution_time):
     )
         view = None
         player_info_embed.set_footer(text=f'{total_execution_time} | use `!help` to know more | use !suggestions to share your ideas',icon_url="https://cdn.discordapp.com/avatars/491251010656927746/6f81dc8d0bc07ff152b244e0958b5961.png?size=1024")
-    await ctx.reply(embed=player_info_embed,view = view)
+    await ctx.respond(embed=player_info_embed,view = view)
 
 
 
