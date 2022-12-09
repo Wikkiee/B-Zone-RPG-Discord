@@ -5,3 +5,4 @@ pymongo[srv]
 beautifulsoup4
 psutil
 py-cpuinfo
+requests
