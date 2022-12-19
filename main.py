@@ -176,7 +176,7 @@ async def on_command_error(ctx,error = ""):
             description = "Please mention the valid member (@mention)"
         elif(error == "CommandNotFound"):
             title = "Command Not Found"
-            description = "Please use the valid command, use [!help] to know more"
+            description = "All prefix commands are moved to slash commands, use [ / ]"
         elif(error == "CommandInvokeError"):
             title = "Ops An Error Occured"
             description = "Please wait, there's some issue with backend server"
