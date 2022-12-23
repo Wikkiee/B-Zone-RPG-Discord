@@ -175,7 +175,7 @@ async def on_command_error(ctx,error = ""):
             title = "Member Not Found"
             description = "Please mention the valid member (@mention)"
         elif(error == "CommandNotFound"):
-            title = "All commands have been moved to /slash commands"
+            title = "Command Not Found"
             description = "Please use the valid command, use [!help] to know more"
         elif(error == "CommandInvokeError"):
             title = "Ops An Error Occured"
