@@ -167,7 +167,7 @@ async def on_command_error(ctx,error = ""):
     def get_error_embed(error,message):
         if(error == "MissingRequiredArgument"):
             title = "Missing Required Argument"
-            description = "Please enter all the required arugments"
+            description = "Please enter all the required arguments"
         elif(error == "MissingPermissions"):
             title = "Missing Permissions"
             description = "Please update my permission and then use that command"
@@ -175,7 +175,7 @@ async def on_command_error(ctx,error = ""):
             title = "Member Not Found"
             description = "Please mention the valid member (@mention)"
         elif(error == "CommandNotFound"):
-            title = "Command Not Found"
+            title = "All commands have been moved to /slash commands"
             description = "Please use the valid command, use [!help] to know more"
         elif(error == "CommandInvokeError"):
             title = "Ops An Error Occured"
