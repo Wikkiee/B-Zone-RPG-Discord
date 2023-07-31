@@ -50,7 +50,7 @@ load_dotenv(find_dotenv())
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
-client = commands.Bot(command_prefix="#",intents = intents)
+client = commands.Bot(command_prefix="!",intents = intents)
 client.remove_command("help")
 
 #----------------------------------> Setups - Ends <--------------------------
@@ -62,11 +62,11 @@ async def on_ready():
     global cpu_info
     cpu_info = cpuinfo.get_cpu_info()["brand_raw"]
     # client.loop.create_task(status_task(client,asyncio,discord),name="stats_task")
-    client.loop.create_task(training_reminder(client,discord),name="training_reminder")
-    client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
-    client.loop.create_task(task_master(client,discord,asyncio),name="task_master")
-    client.loop.create_task(tracker(client,discord),name="tracker")
-    client.loop.create_task(backup_task(client,discord),name="db_backup")
+    # client.loop.create_task(training_reminder(client,discord),name="training_reminder")
+    # client.loop.create_task(watcher(client,discord,asyncio),name="watcher")
+    # client.loop.create_task(task_master(client,discord,asyncio),name="task_master")
+    # client.loop.create_task(tracker(client,discord),name="tracker")
+    # client.loop.create_task(backup_task(client,discord),name="db_backup")
 #------------------------------- Utility Commands-Starts ----------------------------------
 
 @client.event
@@ -176,7 +176,7 @@ async def on_command_error(ctx,error = ""):
             description = "Please mention the valid member (@mention)"
         elif(error == "CommandNotFound"):
             title = "Command Not Found"
-            description = "Please use the valid command, use [!help] to know more"
+            description = "All prefix commands are moved to slash commands, use [ / ]"
         elif(error == "CommandInvokeError"):
             title = "Ops An Error Occured"
             description = "Please wait, there's some issue with backend server"
@@ -706,6 +706,11 @@ async def help(ctx):
 
 
 #------------------------------- Experiment Commands-starts ----------------------------------
+
+@client.slash_command(description="Sends the bot's latency.") # this decorator makes a slash command
+async def ping(ctx): # a slash command will be created with the name "ping"
+    await ctx.respond(f"Pong! Latency is {client.latency}")
+
 
 @client.slash_command(description="Sends the bot's latency.") # this decorator makes a slash command
 async def ping(ctx): # a slash command will be created with the name "ping"
